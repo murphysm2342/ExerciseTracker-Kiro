@@ -6,14 +6,47 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C0357E782F6E4BB100D81413 /* SwiftCheck in Frameworks */ = {isa = PBXBuildFile; productRef = C0357E772F6E4BB100D81413 /* SwiftCheck */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C0357E712F6E4B7B00D81413 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C0357E412F6E497100D81413 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0357E482F6E497100D81413;
+			remoteInfo = "ExerciseTracker-Kiro";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		C0357E492F6E497100D81413 /* ExerciseTracker-Kiro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ExerciseTracker-Kiro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0357E6D2F6E4B7B00D81413 /* ExerciseTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExerciseTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C0357EAF2F6E567E00D81413 /* Exceptions for "ExerciseTracker-Kiro" folder in "ExerciseTracker-Kiro" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C0357E482F6E497100D81413 /* ExerciseTracker-Kiro */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C0357E4B2F6E497100D81413 /* ExerciseTracker-Kiro */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C0357EAF2F6E567E00D81413 /* Exceptions for "ExerciseTracker-Kiro" folder in "ExerciseTracker-Kiro" target */,
+			);
 			path = "ExerciseTracker-Kiro";
+			sourceTree = "<group>";
+		};
+		C0357E6E2F6E4B7B00D81413 /* ExerciseTrackerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ExerciseTrackerTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +59,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0357E6A2F6E4B7B00D81413 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0357E782F6E4BB100D81413 /* SwiftCheck in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -33,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				C0357E4B2F6E497100D81413 /* ExerciseTracker-Kiro */,
+				C0357E6E2F6E4B7B00D81413 /* ExerciseTrackerTests */,
 				C0357E4A2F6E497100D81413 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				C0357E492F6E497100D81413 /* ExerciseTracker-Kiro.app */,
+				C0357E6D2F6E4B7B00D81413 /* ExerciseTrackerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +113,30 @@
 			productReference = C0357E492F6E497100D81413 /* ExerciseTracker-Kiro.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C0357E6C2F6E4B7B00D81413 /* ExerciseTrackerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0357E732F6E4B7B00D81413 /* Build configuration list for PBXNativeTarget "ExerciseTrackerTests" */;
+			buildPhases = (
+				C0357E692F6E4B7B00D81413 /* Sources */,
+				C0357E6A2F6E4B7B00D81413 /* Frameworks */,
+				C0357E6B2F6E4B7B00D81413 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C0357E722F6E4B7B00D81413 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C0357E6E2F6E4B7B00D81413 /* ExerciseTrackerTests */,
+			);
+			name = ExerciseTrackerTests;
+			packageProductDependencies = (
+				C0357E772F6E4BB100D81413 /* SwiftCheck */,
+			);
+			productName = ExerciseTrackerTests;
+			productReference = C0357E6D2F6E4B7B00D81413 /* ExerciseTrackerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -83,6 +150,10 @@
 					C0357E482F6E497100D81413 = {
 						CreatedOnToolsVersion = 26.3;
 					};
+					C0357E6C2F6E4B7B00D81413 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = C0357E482F6E497100D81413;
+					};
 				};
 			};
 			buildConfigurationList = C0357E442F6E497100D81413 /* Build configuration list for PBXProject "ExerciseTracker-Kiro" */;
@@ -94,18 +165,29 @@
 			);
 			mainGroup = C0357E402F6E497100D81413;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C0357E762F6E4BB100D81413 /* XCRemoteSwiftPackageReference "SwiftCheck" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C0357E4A2F6E497100D81413 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				C0357E482F6E497100D81413 /* ExerciseTracker-Kiro */,
+				C0357E6C2F6E4B7B00D81413 /* ExerciseTrackerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C0357E472F6E497100D81413 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C0357E6B2F6E4B7B00D81413 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +204,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0357E692F6E4B7B00D81413 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C0357E722F6E4B7B00D81413 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C0357E482F6E497100D81413 /* ExerciseTracker-Kiro */;
+			targetProxy = C0357E712F6E4B7B00D81413 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		C0357E542F6E497400D81413 /* Debug */ = {
@@ -253,11 +350,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ExerciseTracker-Kiro/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "YM Exercise Tracker";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your workouts to import cardio sessions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -284,11 +384,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "ExerciseTracker-Kiro/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "YM Exercise Tracker";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your workouts to import cardio sessions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -303,6 +406,46 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C0357E742F6E4B7B00D81413 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.YoMurphCo.ExerciseTrackerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ExerciseTracker-Kiro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ExerciseTracker-Kiro";
+			};
+			name = Debug;
+		};
+		C0357E752F6E4B7B00D81413 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.YoMurphCo.ExerciseTrackerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ExerciseTracker-Kiro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ExerciseTracker-Kiro";
 			};
 			name = Release;
 		};
@@ -327,7 +470,35 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		C0357E732F6E4B7B00D81413 /* Build configuration list for PBXNativeTarget "ExerciseTrackerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0357E742F6E4B7B00D81413 /* Debug */,
+				C0357E752F6E4B7B00D81413 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C0357E762F6E4BB100D81413 /* XCRemoteSwiftPackageReference "SwiftCheck" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/typelift/SwiftCheck";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C0357E772F6E4BB100D81413 /* SwiftCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C0357E762F6E4BB100D81413 /* XCRemoteSwiftPackageReference "SwiftCheck" */;
+			productName = SwiftCheck;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C0357E412F6E497100D81413 /* Project object */;
 }

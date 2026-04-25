@@ -1,32 +1,34 @@
-//
-//  ExerciseTracker_KiroApp.swift
-//  ExerciseTracker-Kiro
-//
-//  Created by Sean Murphy on 3/20/26.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
-struct ExerciseTracker_KiroApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+struct ExerciseTrackerApp: App {
+    let modelContainer: ModelContainer
+    let userViewModel: UserViewModel
 
+    init() {
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(
+                for: User.self,
+                     Machine.self,
+                     WorkoutSession.self,
+                     StrengthSet.self,
+                     CardioSession.self,
+                     WorkoutFlow.self,
+                configurations: ModelConfiguration(isStoredInMemoryOnly: false)
+            )
+            modelContainer = container
+            userViewModel = UserViewModel(modelContext: container.mainContext)
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("Failed to initialize ModelContainer: \(error)")
         }
-    }()
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(userViewModel)
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(modelContainer)
     }
 }

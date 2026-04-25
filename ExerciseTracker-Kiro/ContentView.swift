@@ -1,61 +1,37 @@
-//
-//  ContentView.swift
-//  ExerciseTracker-Kiro
-//
-//  Created by Sean Murphy on 3/20/26.
-//
-
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Environment(UserViewModel.self) private var userViewModel
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        if userViewModel.allUsers.isEmpty {
+            // Req 11.6: no users → prompt to create first profile
+            EditProfileView()
+        } else {
+            TabView {
+                HomeView()
+                    .tabItem {
+                        Label("Home", systemImage: "house")
                     }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+
+                HistoryView()
+                    .tabItem {
+                        Label("History", systemImage: "calendar")
                     }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
             }
         }
     }
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    let container = try! ModelContainer(
+        for: User.self, Machine.self, WorkoutSession.self,
+             StrengthSet.self, CardioSession.self, WorkoutFlow.self,
+        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+    )
+    let vm = UserViewModel(modelContext: container.mainContext)
+    return ContentView()
+        .environment(vm)
+        .modelContainer(container)
 }
