@@ -16,34 +16,16 @@ enum NumberPadAction {
 struct NumberPadView: View {
     let onAction: (NumberPadAction) -> Void
 
-    // Layout: 4 rows × 3 columns
     // Row 0: 7  8  9
     // Row 1: 4  5  6
     // Row 2: 1  2  3
-    // Row 3: -5  0  +5   (delete replaces one of these — see below)
-    // Final layout per design: digits 0–9, delete, +5, –5
-    // Row 3: –5  0  +5
-    // Delete key placed at row 2, col 2 position → shift 3 to row 2 col 1
-    // Actual grid:
-    // Row 0: 7  8  9
-    // Row 1: 4  5  6
-    // Row 2: 1  2  3
-    // Row 3: –5  0  +5
-    // Delete: replaces one key — design says 4×3 with digits 0–9, delete, +5, –5 = 12 keys total
-    // 10 digits + delete + +5 + –5 = 13 → one digit must share or delete replaces a slot
-    // Standard phone pad: 1-9 (row 0-2), then bottom row has –5, 0, +5, delete = 4 keys but only 3 cols
-    // Resolution: bottom row = –5 | 0 | +5, and delete replaces "3" position (row 2, col 2)
-    // Final:
-    // Row 0: 7  8  9
-    // Row 1: 4  5  6
-    // Row 2: 1  2  ⌫
-    // Row 3: –5  0  +5
+    // Row 3: -5  0  +5  ⌫
 
     private let rows: [[PadKey]] = [
         [.digit(7), .digit(8), .digit(9)],
         [.digit(4), .digit(5), .digit(6)],
-        [.digit(1), .digit(2), .delete],
-        [.increment(-5), .digit(0), .increment(5)]
+        [.digit(1), .digit(2), .digit(3)],
+        [.increment(-5), .digit(0), .increment(5), .delete]
     ]
 
     var body: some View {

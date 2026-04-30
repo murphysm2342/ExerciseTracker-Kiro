@@ -121,7 +121,8 @@ private struct WorkoutRowView: View {
             }
             Spacer()
             Button("Import", action: onImport)
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
+                .tint(.brand)
                 .controlSize(.small)
         }
         .padding(.vertical, 4)

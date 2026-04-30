@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import SwiftUI
 
 enum UserViewModelError: Error {
     case invalidName
@@ -27,6 +28,8 @@ enum UserViewModelError: Error {
 
     func selectUser(_ user: User) {
         activeUser = user
+        // Note: Machine seeding happens in createUser() for new users.
+        // For existing users being re-selected, machines should already exist.
     }
 
     // MARK: - Create
@@ -38,7 +41,11 @@ enum UserViewModelError: Error {
         let user = User(name: name.trimmingCharacters(in: .whitespaces), colorTag: colorTag)
         modelContext.insert(user)
         try modelContext.save()
+        // Seed default machines for new user (#2)
+        MachineCatalogService.seedIfNeeded(for: user, modelContext: modelContext)
         fetchUsers()
+        // Select the user after creation (moved here to ensure machines are seeded first)
+        selectUser(user)
     }
 
     // MARK: - Update

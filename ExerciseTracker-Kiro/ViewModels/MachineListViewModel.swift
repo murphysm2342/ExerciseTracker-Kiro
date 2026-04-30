@@ -78,7 +78,14 @@ enum MachineListViewModelError: Error {
 
     func toggleFavorite(_ machine: Machine) {
         machine.isFavorite.toggle()
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            print("✅ Toggled favorite for \(machine.name): \(machine.isFavorite)")
+        } catch {
+            print("❌ Failed to save favorite toggle: \(error)")
+            // Revert on error
+            machine.isFavorite.toggle()
+        }
         fetchMachines()
     }
 }

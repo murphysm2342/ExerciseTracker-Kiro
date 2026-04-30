@@ -26,13 +26,14 @@ enum SettingsViewModelError: Error, LocalizedError {
         self.healthKitService = healthKitService
     }
 
-    /// Persists name, colorTag, usesHealthKit, and cardioSource for the given user.
+    /// Persists name, colorTag, usesHealthKit, syncToHealthKit, and cardioSource for the given user.
     /// Req 12.2, 12.3, 12.5
     func saveUserPreferences(
         for user: User,
         name: String,
         colorTag: String?,
         usesHealthKit: Bool,
+        syncToHealthKit: Bool,
         cardioSource: CardioSource
     ) throws {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
@@ -42,6 +43,7 @@ enum SettingsViewModelError: Error, LocalizedError {
         user.name = trimmed
         user.colorTag = colorTag
         user.usesHealthKit = usesHealthKit
+        user.syncToHealthKit = syncToHealthKit
         user.preferredCardioSource = cardioSource
         do {
             try modelContext.save()

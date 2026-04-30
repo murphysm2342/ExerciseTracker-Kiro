@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "AE4620C7-D808-4A1B-9484-B9A831F80395",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ExerciseTracker-Kiro.xcodeproj",
+      "identifier" : "C0357E482F6E497100D81413",
+      "name" : "ExerciseTracker-Kiro"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:ExerciseTracker-Kiro.xcodeproj",
+        "identifier" : "C0357E6C2F6E4B7B00D81413",
+        "name" : "ExerciseTrackerTests"
+      }
+    }
+  ],
+  "version" : 1
+}

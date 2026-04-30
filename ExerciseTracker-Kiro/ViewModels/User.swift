@@ -6,28 +6,32 @@ import SwiftData
     var name: String
     var colorTag: String?
     var createdAt: Date
-    var usesHealthKit: Bool
     var preferredCardioSource: CardioSource
-    @Relationship(deleteRule: .cascade) var machines: [Machine]
-    @Relationship(deleteRule: .cascade) var workoutSessions: [WorkoutSession]
-    @Relationship(deleteRule: .cascade) var workoutFlows: [WorkoutFlow]
-
+    /// Whether to allow importing cardio workouts from HealthKit
+    var usesHealthKit: Bool
+    /// Task 7: Whether to automatically export/sync workouts TO HealthKit
+    var syncToHealthKit: Bool
+    
+    @Relationship(deleteRule: .cascade, inverse: \Machine.user) var machines: [Machine]
+    @Relationship(deleteRule: .cascade, inverse: \WorkoutSession.user) var workoutSessions: [WorkoutSession]
+    
     init(
         id: UUID = UUID(),
         name: String,
         colorTag: String? = nil,
         createdAt: Date = Date(),
+        preferredCardioSource: CardioSource = .manual,
         usesHealthKit: Bool = false,
-        preferredCardioSource: CardioSource = .manual
+        syncToHealthKit: Bool = false
     ) {
         self.id = id
         self.name = name
         self.colorTag = colorTag
         self.createdAt = createdAt
-        self.usesHealthKit = usesHealthKit
         self.preferredCardioSource = preferredCardioSource
+        self.usesHealthKit = usesHealthKit
+        self.syncToHealthKit = syncToHealthKit
         self.machines = []
         self.workoutSessions = []
-        self.workoutFlows = []
     }
 }

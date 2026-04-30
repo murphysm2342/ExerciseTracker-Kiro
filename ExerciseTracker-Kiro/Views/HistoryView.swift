@@ -17,13 +17,10 @@ struct HistoryView: View {
                 }
             }
             .navigationTitle("History")
+            .background(Color.surfaceLight)
         }
-        .onAppear {
-            setupViewModel()
-        }
-        .onChange(of: userViewModel.activeUser?.id) {
-            setupViewModel()
-        }
+        .onAppear { setupViewModel() }
+        .onChange(of: userViewModel.activeUser?.id) { setupViewModel() }
     }
 
     private func setupViewModel() {
@@ -39,58 +36,80 @@ struct HistoryView: View {
 
 private struct HistoryContentView: View {
     @Environment(UserViewModel.self) private var userViewModel
+    @Environment(\.modelContext) private var modelContext
     var viewModel: HistoryViewModel
 
-    // Dates that have at least one session (for calendar marking)
-    private var datesWithSessions: Set<DateComponents> {
-        let calendar = Calendar.current
-        return Set(viewModel.sessions.map {
-            calendar.dateComponents([.year, .month, .day], from: $0.date)
-        })
-    }
+    @State private var showAddStrength = false
+    @State private var showAddCardio = false
+    @State private var sessionToDelete: WorkoutSession?
 
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // Monthly calendar (Req 8.1)
-                calendarSection
+                WorkoutCalendarView(
+                    selectedDate: Binding(
+                        get: { viewModel.selectedDate },
+                        set: { viewModel.selectDate($0) }
+                    ),
+                    workoutDays: viewModel.workoutDayComponents
+                )
+                .padding(.horizontal)
 
-                Divider()
-                    .padding(.vertical, 8)
+                Divider().padding(.vertical, 8)
 
-                // Session list (Req 8.2, 8.6)
                 sessionListSection
+                    .padding(.horizontal)
             }
-            .padding(.horizontal)
+        }
+        .background(Color.surfaceLight)
+        .onAppear {
+            if let user = userViewModel.activeUser {
+                viewModel.refresh(for: user)
+            }
+        }
+        .sheet(isPresented: $showAddStrength, onDismiss: refreshAfterAdd) {
+            if let user = userViewModel.activeUser, let date = viewModel.selectedDate {
+                ActiveWorkoutView(user: user, modelContext: modelContext, date: date)
+            }
+        }
+        .sheet(isPresented: $showAddCardio, onDismiss: refreshAfterAdd) {
+            if let user = userViewModel.activeUser, let date = viewModel.selectedDate {
+                NavigationStack {
+                    CardioLoggingView(user: user, date: date)
+                }
+            }
+        }
+        .confirmationDialog(
+            "Delete Workout",
+            isPresented: Binding(
+                get: { sessionToDelete != nil },
+                set: { if !$0 { sessionToDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                if let session = sessionToDelete {
+                    deleteSession(session)
+                }
+            }
+            Button("Cancel", role: .cancel) { sessionToDelete = nil }
+        } message: {
+            Text("This will permanently delete this workout and all its data.")
         }
     }
 
-    // MARK: - Calendar
+    private func deleteSession(_ session: WorkoutSession) {
+        modelContext.delete(session)
+        try? modelContext.save()
+        sessionToDelete = nil
+        if let user = userViewModel.activeUser {
+            viewModel.refresh(for: user)
+        }
+    }
 
-    private var calendarSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Use DatePicker in graphical style as the calendar (Req 8.1)
-            DatePicker(
-                "Select Date",
-                selection: Binding(
-                    get: { viewModel.selectedDate ?? Date() },
-                    set: { viewModel.selectDate($0) }
-                ),
-                displayedComponents: .date
-            )
-            .datePickerStyle(.graphical)
-            .overlay(alignment: .top) {
-                // Invisible overlay to intercept — dots are drawn via background decoration
-                Color.clear
-            }
-            // Annotate days with sessions using a custom calendar grid overlay
-            .background(
-                CalendarDotOverlay(
-                    datesWithSessions: datesWithSessions,
-                    selectedDate: viewModel.selectedDate
-                )
-                .allowsHitTesting(false)
-            )
+    private func refreshAfterAdd() {
+        if let user = userViewModel.activeUser {
+            viewModel.refresh(for: user)
         }
     }
 
@@ -99,23 +118,61 @@ private struct HistoryContentView: View {
     @ViewBuilder
     private var sessionListSection: some View {
         if let selected = viewModel.selectedDate {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: DesignTokens.itemSpacing) {
                 Text(selected, style: .date)
                     .font(.headline)
                     .padding(.top, 4)
 
                 if viewModel.sessionsOnSelectedDate.isEmpty {
-                    Text("No workouts on this day.")
-                        .foregroundStyle(.secondary)
-                        .padding(.vertical, 8)
+                    HStack(spacing: 10) {
+                        Image(systemName: "moon.zzz")
+                            .foregroundStyle(.tertiary)
+                        Text("No workouts on this day.")
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .cardStyle()
                 } else {
                     ForEach(viewModel.sessionsOnSelectedDate) { session in
-                        NavigationLink(destination: WorkoutDetailView(session: session)) {
-                            SessionRowView(session: session)
-                        }
-                        .buttonStyle(.plain)
+                        InlineSessionCard(session: session)
+                            .contextMenu {
+                                Button(role: .destructive) {
+                                    sessionToDelete = session
+                                } label: {
+                                    Label("Delete Workout", systemImage: "trash")
+                                }
+                            }
                     }
                 }
+
+                VStack(spacing: DesignTokens.itemSpacing) {
+                    Button { showAddStrength = true } label: {
+                        HStack(spacing: 8) {
+                            IconBadge(systemName: "dumbbell.fill", color: .white, size: 28)
+                            Text("Add Strength Workout")
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(LinearGradient.strengthGradient)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.buttonRadius))
+                    }
+
+                    Button { showAddCardio = true } label: {
+                        HStack(spacing: 8) {
+                            IconBadge(systemName: "figure.run", color: .white, size: 28)
+                            Text("Add Cardio Workout")
+                                .fontWeight(.semibold)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(LinearGradient.cardioGradient)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.buttonRadius))
+                    }
+                }
+                .padding(.top, 4)
             }
         } else {
             if viewModel.sessions.isEmpty {
@@ -126,97 +183,282 @@ private struct HistoryContentView: View {
                 )
                 .padding(.top, 32)
             } else {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Tap a date on the calendar to see workouts.")
-                        .foregroundStyle(.secondary)
-                        .font(.subheadline)
-                        .padding(.top, 8)
-                }
+                Text("Tap a date on the calendar to see workouts.")
+                    .foregroundStyle(.secondary)
+                    .font(.subheadline)
+                    .padding(.top, 8)
             }
         }
     }
 }
 
-// MARK: - SessionRowView
+// MARK: - Workout Calendar View
 
-/// Displays workout type, date, and summary label for a session (Req 8.6)
-struct SessionRowView: View {
+struct WorkoutCalendarView: View {
+    @Binding var selectedDate: Date?
+    let workoutDays: Set<DateComponents>
+
+    @State private var displayedMonth = Date()
+
+    private let calendar = Calendar.current
+    private let daySymbols = Calendar.current.veryShortWeekdaySymbols
+
+    var body: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Button { changeMonth(by: -1) } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color.brand)
+                }
+                Spacer()
+                Text(displayedMonth, format: .dateTime.month(.wide).year())
+                    .font(.headline)
+                Spacer()
+                Button { changeMonth(by: 1) } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(Color.brand)
+                }
+            }
+            .padding(.horizontal, 4)
+
+            HStack(spacing: 0) {
+                ForEach(daySymbols, id: \.self) { symbol in
+                    Text(symbol)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0), count: 7), spacing: 4) {
+                ForEach(calendarDays(), id: \.self) { day in
+                    if let date = day {
+                        let isSelected = isSelected(date)
+                        let hasWorkout = hasWorkout(on: date)
+                        let isCurrentDay = isToday(date)
+                        let isCurrentMonth = calendar.isDate(date, equalTo: displayedMonth, toGranularity: .month)
+
+                        Button {
+                            selectedDate = date
+                        } label: {
+                            Text("\(calendar.component(.day, from: date))")
+                                .font(.subheadline)
+                                .fontWeight(isCurrentDay ? .bold : .regular)
+                                .foregroundColor(
+                                    isSelected ? .white :
+                                    !isCurrentMonth ? Color.secondary.opacity(0.4) :
+                                    isCurrentDay ? Color.brand :
+                                    .primary
+                                )
+                                .frame(width: 34, height: 34)
+                                .background(
+                                    Group {
+                                        if isSelected {
+                                            Circle().fill(Color.brand)
+                                        } else if hasWorkout {
+                                            Circle().fill(Color.brand.opacity(0.25))
+                                        }
+                                    }
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Text("")
+                            .frame(width: 34, height: 34)
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.cornerRadius))
+        .shadow(color: .black.opacity(0.04), radius: 6, x: 0, y: 2)
+    }
+
+    private func changeMonth(by value: Int) {
+        if let newMonth = calendar.date(byAdding: .month, value: value, to: displayedMonth) {
+            displayedMonth = newMonth
+        }
+    }
+
+    private func calendarDays() -> [Date?] {
+        guard let range = calendar.range(of: .day, in: .month, for: displayedMonth),
+              let firstOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth))
+        else { return [] }
+
+        let weekdayOfFirst = calendar.component(.weekday, from: firstOfMonth) - 1
+        var days: [Date?] = Array(repeating: nil, count: weekdayOfFirst)
+
+        for day in range {
+            if let date = calendar.date(byAdding: .day, value: day - 1, to: firstOfMonth) {
+                days.append(date)
+            }
+        }
+
+        while days.count % 7 != 0 {
+            days.append(nil)
+        }
+        return days
+    }
+
+    private func isSelected(_ date: Date) -> Bool {
+        guard let selected = selectedDate else { return false }
+        return calendar.isDate(date, inSameDayAs: selected)
+    }
+
+    private func hasWorkout(on date: Date) -> Bool {
+        let comps = calendar.dateComponents([.year, .month, .day], from: date)
+        return workoutDays.contains(comps)
+    }
+
+    private func isToday(_ date: Date) -> Bool {
+        calendar.isDateInToday(date)
+    }
+}
+
+// MARK: - InlineSessionCard
+
+struct InlineSessionCard: View {
     let session: WorkoutSession
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: session.type == .strength ? "dumbbell.fill" : "figure.run")
-                .foregroundStyle(session.type == .strength ? Color.blue : Color.green)
-                .frame(width: 32, height: 32)
-                .background(
-                    (session.type == .strength ? Color.blue : Color.green)
-                        .opacity(0.12)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                )
+        NavigationLink(destination: WorkoutDetailView(session: session)) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 10) {
+                    IconBadge(
+                        systemName: session.type == .strength ? "dumbbell.fill" : "figure.run",
+                        color: session.type == .strength ? .strengthAccent : .cardioAccent,
+                        size: 32
+                    )
+                    Text(session.type == .strength ? "Strength Workout" : "Cardio Workout")
+                        .font(.subheadline).fontWeight(.semibold)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(session.type == .strength ? "Strength" : "Cardio")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                Text(session.date, style: .date)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(summaryLabel(for: session))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Divider()
+
+                switch session.type {
+                case .strength:
+                    strengthDetail
+                case .cardio:
+                    cardioDetail
+                }
             }
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
+            .cardStyle()
         }
-        .padding(.vertical, 8)
-        .padding(.horizontal, 12)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .buttonStyle(.plain)
     }
 
-    private func summaryLabel(for session: WorkoutSession) -> String {
-        switch session.type {
-        case .strength:
-            let completed = session.strengthSets.filter(\.isCompleted).count
-            let total = session.strengthSets.count
-            let machines = Set(session.strengthSets.map { $0.machine.name })
-            if machines.isEmpty {
-                return "No sets recorded"
+    private var strengthDetail: some View {
+        let grouped = groupedByMachine(session.strengthSets)
+        return VStack(alignment: .leading, spacing: 8) {
+            if grouped.isEmpty {
+                Text("No sets recorded")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(grouped, id: \.machineName) { group in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack(spacing: 6) {
+                            Image(systemName: MachineIconProvider.icon(for: group.machineName))
+                                .font(.caption)
+                                .foregroundStyle(Color.brand)
+                            Text(group.machineName)
+                                .font(.caption).fontWeight(.semibold)
+                        }
+                        ForEach(group.sets.sorted { $0.setNumber < $1.setNumber }) { set in
+                            HStack(spacing: 8) {
+                                Text("Set \(set.setNumber)")
+                                    .foregroundStyle(.secondary)
+                                Text("\(StrengthLoggingViewModel.formatDouble(set.weight)) lb")
+                                Text("\u{00D7}")
+                                    .foregroundStyle(.secondary)
+                                Text("\(set.reps) reps")
+                                if set.isCompleted {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                            .font(.caption)
+                        }
+                    }
+                }
             }
-            return "\(completed)/\(total) sets · \(machines.sorted().joined(separator: ", "))"
-        case .cardio:
+        }
+    }
+
+    private var cardioDetail: some View {
+        Group {
             if let cardio = session.cardioSession {
-                var parts: [String] = []
-                parts.append(String(format: "%.0f min", cardio.durationMinutes))
-                if let dist = cardio.distanceMiles {
-                    parts.append(String(format: "%.1f mi", dist))
+                VStack(alignment: .leading, spacing: 6) {
+                    if let type = cardio.machineType {
+                        HStack(spacing: 6) {
+                            Image(systemName: type.iconName)
+                                .font(.caption)
+                                .foregroundStyle(Color.cardioAccent)
+                            Text(type.displayName)
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                        }
+                    }
+                    HStack(spacing: 16) {
+                        Label(String(format: "%.0f min", cardio.durationMinutes), systemImage: "clock")
+                        if let dist = cardio.distanceMiles {
+                            Label(String(format: "%.1f mi", dist), systemImage: "figure.walk")
+                        }
+                        if let hr = cardio.avgHeartRate {
+                            Label(String(format: "%.0f bpm", hr), systemImage: "heart.fill")
+                                .foregroundStyle(.red)
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                    HStack(spacing: 16) {
+                        if let resistance = cardio.resistance {
+                            Label(String(format: "Res: %.0f", resistance), systemImage: "dial.medium")
+                        }
+                        if let floors = cardio.floors {
+                            Label("\(floors) floors", systemImage: "figure.stair.stepper")
+                        }
+                        if let strokes = cardio.strokeCount {
+                            Label("\(strokes) strokes", systemImage: "oar.2.crossed")
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
-                if let hr = cardio.avgHeartRate {
-                    parts.append(String(format: "%.0f bpm", hr))
-                }
-                return parts.joined(separator: " · ")
+            } else {
+                Text("Cardio session")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            return "Cardio session"
         }
     }
-}
 
-// MARK: - CalendarDotOverlay
+    private struct MachineGroup {
+        let machineName: String
+        let sets: [StrengthSet]
+    }
 
-/// Draws small dots below day numbers for dates that have sessions.
-/// This is a lightweight overlay — it doesn't interfere with DatePicker interaction.
-private struct CalendarDotOverlay: View {
-    let datesWithSessions: Set<DateComponents>
-    let selectedDate: Date?
-
-    var body: some View {
-        // We can't easily position dots over individual day cells in DatePicker's graphical style,
-        // so we use a subtle legend below the calendar instead.
-        EmptyView()
+    private func groupedByMachine(_ sets: [StrengthSet]) -> [MachineGroup] {
+        var order: [String] = []
+        var dict: [String: [StrengthSet]] = [:]
+        for set in sets.sorted(by: { $0.setNumber < $1.setNumber }) {
+            let name = set.machine.name
+            if dict[name] == nil {
+                order.append(name)
+                dict[name] = []
+            }
+            dict[name]!.append(set)
+        }
+        return order.map { MachineGroup(machineName: $0, sets: dict[$0]!) }
     }
 }
 

@@ -1,21 +1,19 @@
 import SwiftUI
 import SwiftData
+import HealthKit
 
-/// Settings screen scoped to the active user.
-/// Requirements: 6.1, 6.2, 6.3, 6.4, 12.1, 12.2, 12.3, 12.4, 12.5
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(UserViewModel.self) private var userViewModel
 
     @State private var viewModel: SettingsViewModel?
 
-    // Form state
     @State private var name: String = ""
     @State private var colorTag: String = ""
     @State private var usesHealthKit: Bool = false
+    @State private var syncToHealthKit: Bool = false
     @State private var cardioSource: CardioSource = .manual
 
-    // UI state
     @State private var validationError: String?
     @State private var saveError: String?
     @State private var isRequestingHK: Bool = false
@@ -24,9 +22,27 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            // Req 12.2: name and color tag
-            Section("Profile") {
-                TextField("Name", text: $name)
+            Section {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle()
+                            .fill(color(for: colorTag).gradient)
+                            .frame(width: 48, height: 48)
+                        Text(String(name.prefix(1)).uppercased())
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Profile")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        TextField("Name", text: $name)
+                            .font(.body)
+                            .fontWeight(.medium)
+                    }
+                }
+                .listRowBackground(Color.cardBackground)
 
                 Picker("Color Tag", selection: $colorTag) {
                     Text("None").tag("")
@@ -40,36 +56,95 @@ struct SettingsView: View {
                         .tag(option)
                     }
                 }
+                .listRowBackground(Color.cardBackground)
             }
 
-            // Req 12.3: HealthKit toggle and cardio source picker
             Section("Cardio Preferences") {
-                Toggle("Use HealthKit", isOn: $usesHealthKit)
-                    .onChange(of: usesHealthKit) { oldValue, newValue in
-                        // Req 6.2: request permissions when first enabled
-                        if newValue && !oldValue {
-                            Task { await requestHealthKitIfNeeded() }
+                if HKHealthStore.isHealthDataAvailable() {
+                    Toggle("Use HealthKit", isOn: $usesHealthKit)
+                        .tint(.brand)
+                        .onChange(of: usesHealthKit) { oldValue, newValue in
+                            if newValue && !oldValue {
+                                Task { await requestHealthKitIfNeeded() }
+                            }
                         }
+                } else {
+                    HStack {
+                        Text("Use HealthKit")
+                        Spacer()
+                        Text("Not Available")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
+                }
 
                 Picker("Cardio Source", selection: $cardioSource) {
                     Text("Manual Entry").tag(CardioSource.manual)
-                    Text("HealthKit").tag(CardioSource.healthKit)
+                    if HKHealthStore.isHealthDataAvailable() {
+                        Text("HealthKit").tag(CardioSource.healthKit)
+                    }
                 }
                 .pickerStyle(.segmented)
             }
+            .listRowBackground(Color.cardBackground)
 
-            // Req 12.4: navigation to machine management and workout flow management
-            Section("Manage") {
-                NavigationLink("Machines") {
-                    MachineListView()
+            Section("HealthKit Export") {
+                if HKHealthStore.isHealthDataAvailable() {
+                    Toggle("Sync Workouts to Health", isOn: $syncToHealthKit)
+                        .tint(.brand)
+                        .onChange(of: syncToHealthKit) { oldValue, newValue in
+                            if newValue && !oldValue {
+                                Task { await requestHealthKitIfNeeded() }
+                            }
+                        }
+                } else {
+                    HStack {
+                        Text("Sync Workouts to Health")
+                        Spacer()
+                        Text("Not Available")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                NavigationLink("Workout Flows") {
+
+                Text(HKHealthStore.isHealthDataAvailable()
+                     ? "Automatically export your workouts to the Health app."
+                     : "HealthKit is not available on this device.")
+                    .font(.caption)
+                    .foregroundStyle(Color.subtleText)
+            }
+            .listRowBackground(Color.cardBackground)
+
+            Section("Manage") {
+                NavigationLink {
+                    MachineListView()
+                } label: {
+                    HStack(spacing: 12) {
+                        IconBadge(systemName: "dumbbell.fill", color: .strengthAccent, size: 32)
+                        Text("Machines")
+                    }
+                }
+
+                NavigationLink {
                     WorkoutFlowListView()
+                } label: {
+                    HStack(spacing: 12) {
+                        IconBadge(systemName: "list.bullet.rectangle", color: .brand, size: 32)
+                        Text("Workout Flows")
+                    }
+                }
+
+                NavigationLink {
+                    AppIconExportView()
+                } label: {
+                    HStack(spacing: 12) {
+                        IconBadge(systemName: "app.badge", color: .purple, size: 32)
+                        Text("Export App Icon")
+                    }
                 }
             }
+            .listRowBackground(Color.cardBackground)
 
-            // Validation / error display
             if let error = validationError ?? saveError {
                 Section {
                     Text(error)
@@ -79,19 +154,26 @@ struct SettingsView: View {
             }
 
             Section {
-                Button("Save") {
+                Button {
                     save()
+                } label: {
+                    Text("Save")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
                 }
-                .frame(maxWidth: .infinity)
+                .listRowBackground(Color.brand)
                 .disabled(isRequestingHK)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.surfaceLight)
         .navigationTitle("Settings")
         .onAppear {
             viewModel = SettingsViewModel(modelContext: modelContext)
             loadFromActiveUser()
         }
-        // Req 6.5: apply new user's preferences immediately on active user switch
         .onChange(of: userViewModel.activeUser) { _, _ in
             loadFromActiveUser()
         }
@@ -104,6 +186,7 @@ struct SettingsView: View {
         name = user.name
         colorTag = user.colorTag ?? ""
         usesHealthKit = user.usesHealthKit
+        syncToHealthKit = user.syncToHealthKit
         cardioSource = user.preferredCardioSource
         validationError = nil
         saveError = nil
@@ -115,12 +198,12 @@ struct SettingsView: View {
         saveError = nil
         let tagValue: String? = colorTag.isEmpty ? nil : colorTag
         do {
-            // Req 12.5: persist immediately on save
             try vm.saveUserPreferences(
                 for: user,
                 name: name,
                 colorTag: tagValue,
                 usesHealthKit: usesHealthKit,
+                syncToHealthKit: syncToHealthKit,
                 cardioSource: cardioSource
             )
         } catch SettingsViewModelError.invalidName {
@@ -131,14 +214,20 @@ struct SettingsView: View {
     }
 
     private func requestHealthKitIfNeeded() async {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            usesHealthKit = false
+            syncToHealthKit = false
+            saveError = "HealthKit is not available on this device."
+            return
+        }
         guard let vm = viewModel else { return }
         isRequestingHK = true
         defer { isRequestingHK = false }
         do {
             try await vm.requestHealthKitPermissions()
         } catch {
-            // If permission denied, revert toggle and show error
             usesHealthKit = false
+            syncToHealthKit = false
             saveError = "HealthKit access was denied. Please enable it in Settings > Privacy > Health."
         }
     }

@@ -8,6 +8,7 @@ import SwiftData
     var isFavorite: Bool
     var lastUsedWeight: Double?
     var lastUsedReps: Int?
+    var nfcTagId: String?
     @Relationship var user: User
 
     init(
@@ -17,6 +18,7 @@ import SwiftData
         isFavorite: Bool = false,
         lastUsedWeight: Double? = nil,
         lastUsedReps: Int? = nil,
+        nfcTagId: String? = nil,
         user: User
     ) {
         self.id = id
@@ -25,6 +27,7 @@ import SwiftData
         self.isFavorite = isFavorite
         self.lastUsedWeight = lastUsedWeight
         self.lastUsedReps = lastUsedReps
+        self.nfcTagId = nfcTagId
         self.user = user
     }
 }

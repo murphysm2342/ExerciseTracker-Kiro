@@ -1,21 +1,18 @@
 import SwiftUI
 import SwiftData
 
-/// Detail view for a single WorkoutSession.
-/// - Strength: groups StrengthSets by machine (Req 8.3)
-/// - Cardio: shows duration, distance, incline, heart rate (Req 8.3)
 struct WorkoutDetailView: View {
     let session: WorkoutSession
+    @Environment(\.modelContext) private var modelContext
+    @Environment(UserViewModel.self) private var userViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var contentID = UUID()
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Header
+            VStack(alignment: .leading, spacing: DesignTokens.sectionSpacing) {
                 sessionHeader
-
-                Divider()
-
-                // Content by type
                 switch session.type {
                 case .strength:
                     strengthContent
@@ -25,22 +22,55 @@ struct WorkoutDetailView: View {
             }
             .padding()
         }
+        .id(contentID)
+        .onAppear { contentID = UUID() }
+        .background(Color.surfaceLight)
         .navigationTitle(session.type == .strength ? "Strength Workout" : "Cardio Workout")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .destructiveAction) {
+                Button(role: .destructive) {
+                    showDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .foregroundStyle(.red)
+                }
+            }
+        }
+        .confirmationDialog(
+            "Delete Workout",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete", role: .destructive) {
+                deleteWorkout()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete this workout and all its data. This cannot be undone.")
+        }
+    }
+
+    private func deleteWorkout() {
+        modelContext.delete(session)
+        try? modelContext.save()
+        dismiss()
     }
 
     // MARK: - Header
 
     private var sessionHeader: some View {
-        HStack(spacing: 12) {
-            Image(systemName: session.type == .strength ? "dumbbell.fill" : "figure.run")
-                .font(.title2)
-                .foregroundStyle(session.type == .strength ? Color.blue : Color.green)
+        HStack(spacing: 14) {
+            IconBadge(
+                systemName: session.type == .strength ? "dumbbell.fill" : "figure.run",
+                color: session.type == .strength ? .strengthAccent : .cardioAccent,
+                size: 48
+            )
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(session.type == .strength ? "Strength" : "Cardio")
-                    .font(.title3)
-                    .fontWeight(.semibold)
+                    .font(.title2)
+                    .fontWeight(.bold)
                 Text(session.date.formatted(date: .long, time: .shortened))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -50,23 +80,40 @@ struct WorkoutDetailView: View {
 
     // MARK: - Strength content
 
-    /// Groups sets by machine and renders each group (Req 8.3)
     private var strengthContent: some View {
         let grouped = groupedByMachine(session.strengthSets)
 
-        return VStack(alignment: .leading, spacing: 20) {
+        return VStack(alignment: .leading, spacing: DesignTokens.itemSpacing) {
             if grouped.isEmpty {
                 Text("No sets recorded.")
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(grouped, id: \.machineName) { group in
-                    MachineSetGroupView(machineName: group.machineName, sets: group.sets)
+                    VStack(alignment: .leading, spacing: 8) {
+                        MachineSetGroupView(machineName: group.machineName, sets: group.sets)
+
+                        if let user = userViewModel.activeUser,
+                           let machine = group.sets.first?.machine {
+                            NavigationLink {
+                                StrengthLoggingView(
+                                    machine: machine,
+                                    user: user,
+                                    session: session,
+                                    modelContext: modelContext
+                                )
+                            } label: {
+                                Label("Edit Sets", systemImage: "pencil")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(Color.brand)
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-    /// Groups StrengthSets by machine name, preserving set order within each group.
     private func groupedByMachine(_ sets: [StrengthSet]) -> [MachineSetGroup] {
         var order: [String] = []
         var dict: [String: [StrengthSet]] = [:]
@@ -88,19 +135,105 @@ struct WorkoutDetailView: View {
     private var cardioContent: some View {
         Group {
             if let cardio = session.cardioSession {
-                VStack(alignment: .leading, spacing: 12) {
-                    CardioStatRow(label: "Duration", value: String(format: "%.0f min", cardio.durationMinutes))
-
-                    if let dist = cardio.distanceMiles {
-                        CardioStatRow(label: "Distance", value: String(format: "%.2f mi", dist))
+                VStack(spacing: DesignTokens.itemSpacing) {
+                    if let type = cardio.machineType {
+                        HStack(spacing: 10) {
+                            Image(systemName: type.iconName)
+                                .font(.title3)
+                                .foregroundStyle(Color.cardioAccent)
+                            Text(type.displayName)
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    if let incline = cardio.incline {
-                        CardioStatRow(label: "Incline", value: String(format: "%.1f%%", incline))
+                    HStack(spacing: DesignTokens.itemSpacing) {
+                        StatCard(
+                            title: "Duration",
+                            value: String(format: "%.0f min", cardio.durationMinutes),
+                            systemImage: "clock.fill",
+                            color: .cardioAccent
+                        )
+                        if let dist = cardio.distanceMiles {
+                            StatCard(
+                                title: "Distance",
+                                value: String(format: "%.2f mi", dist),
+                                systemImage: "figure.walk",
+                                color: .blue
+                            )
+                        }
                     }
-
-                    if let hr = cardio.avgHeartRate {
-                        CardioStatRow(label: "Avg Heart Rate", value: String(format: "%.0f bpm", hr))
+                    HStack(spacing: DesignTokens.itemSpacing) {
+                        if let incline = cardio.incline {
+                            StatCard(
+                                title: "Incline",
+                                value: String(format: "%.1f%%", incline),
+                                systemImage: "arrow.up.right",
+                                color: .orange
+                            )
+                        }
+                        if let hr = cardio.avgHeartRate {
+                            StatCard(
+                                title: "Avg Heart Rate",
+                                value: String(format: "%.0f bpm", hr),
+                                systemImage: "heart.fill",
+                                color: .red
+                            )
+                        }
+                    }
+                    HStack(spacing: DesignTokens.itemSpacing) {
+                        if let resistance = cardio.resistance {
+                            StatCard(
+                                title: "Resistance",
+                                value: String(format: "%.0f", resistance),
+                                systemImage: "dial.medium",
+                                color: .purple
+                            )
+                        }
+                        if let speed = cardio.speed {
+                            StatCard(
+                                title: "Speed",
+                                value: String(format: "%.1f mph", speed),
+                                systemImage: "gauge.with.needle",
+                                color: .cyan
+                            )
+                        }
+                    }
+                    HStack(spacing: DesignTokens.itemSpacing) {
+                        if let floors = cardio.floors {
+                            StatCard(
+                                title: "Floors",
+                                value: "\(floors)",
+                                systemImage: "figure.stair.stepper",
+                                color: .orange
+                            )
+                        }
+                        if let strides = cardio.strides {
+                            StatCard(
+                                title: "Strides",
+                                value: "\(strides)",
+                                systemImage: "shoeprints.fill",
+                                color: .green
+                            )
+                        }
+                    }
+                    HStack(spacing: DesignTokens.itemSpacing) {
+                        if let strokes = cardio.strokeCount {
+                            StatCard(
+                                title: "Strokes",
+                                value: "\(strokes)",
+                                systemImage: "oar.2.crossed",
+                                color: .teal
+                            )
+                        }
+                        if let rpm = cardio.rpm {
+                            StatCard(
+                                title: "RPM",
+                                value: String(format: "%.0f", rpm),
+                                systemImage: "arrow.trianglehead.2.counterclockwise.rotate.90",
+                                color: .indigo
+                            )
+                        }
                     }
                 }
             } else {
@@ -126,11 +259,17 @@ private struct MachineSetGroupView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(machineName)
-                .font(.headline)
+            HStack(spacing: 8) {
+                IconBadge(
+                    systemName: MachineIconProvider.icon(for: machineName),
+                    color: .brand,
+                    size: 32
+                )
+                Text(machineName)
+                    .font(.headline)
+            }
 
             VStack(spacing: 4) {
-                // Column headers
                 HStack {
                     Text("Set")
                         .font(.caption)
@@ -160,6 +299,7 @@ private struct MachineSetGroupView: View {
                             .frame(width: 36, alignment: .leading)
                         Text(String(format: "%.1f lb", set.weight))
                             .font(.subheadline)
+                            .fontWeight(.medium)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         Text("\(set.reps)")
                             .font(.subheadline)
@@ -169,7 +309,7 @@ private struct MachineSetGroupView: View {
                             .frame(width: 40, alignment: .trailing)
                     }
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 5)
                     .background(
                         set.isCompleted
                             ? Color.green.opacity(0.06)
@@ -179,30 +319,9 @@ private struct MachineSetGroupView: View {
                 }
             }
             .padding(.vertical, 8)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.smallRadius))
         }
-    }
-}
-
-// MARK: - CardioStatRow
-
-private struct CardioStatRow: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(label)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .fontWeight(.medium)
-        }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 14)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

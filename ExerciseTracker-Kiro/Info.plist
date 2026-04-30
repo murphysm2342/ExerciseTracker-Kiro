@@ -6,5 +6,13 @@
 	<array>
 		<dict/>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>ExerciseTracker saves the app icon image to your photo library so you can use it in Xcode.</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>ExerciseTracker uses NFC to scan gym machine tags for quick workout logging.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>ExerciseTracker reads your workout and heart rate data to display cardio metrics.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>ExerciseTracker saves your workouts to Apple Health so all your fitness data is in one place.</string>
 </dict>
 </plist>

@@ -8,7 +8,7 @@ import SwiftData
     var reps: Int
     var isCompleted: Bool
     @Relationship var machine: Machine
-    @Relationship var session: WorkoutSession
+    @Relationship(inverse: \WorkoutSession.strengthSets) var session: WorkoutSession
 
     init(
         id: UUID = UUID(),

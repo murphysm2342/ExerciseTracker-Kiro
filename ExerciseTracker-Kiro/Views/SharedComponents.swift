@@ -2,8 +2,6 @@ import SwiftUI
 
 // MARK: - CardView
 
-/// A container with rounded corners and a subtle shadow/background.
-/// Use to visually group related content across screens.
 struct CardView<Content: View>: View {
     let content: Content
 
@@ -13,16 +11,15 @@ struct CardView<Content: View>: View {
 
     var body: some View {
         content
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14))
-            .shadow(color: .black.opacity(0.06), radius: 4, x: 0, y: 2)
+            .padding(DesignTokens.cardPadding)
+            .background(Color.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.cornerRadius))
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
     }
 }
 
 // MARK: - PrimaryButton
 
-/// Prominent action button with accent color background and white text.
 struct PrimaryButton: View {
     let title: String
     let systemImage: String?
@@ -39,22 +36,23 @@ struct PrimaryButton: View {
             HStack(spacing: 8) {
                 if let icon = systemImage {
                     Image(systemName: icon)
+                        .font(.body.weight(.semibold))
                 }
                 Text(title)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(Color.accentColor)
+            .padding(.vertical, 15)
+            .background(LinearGradient.brandGradient)
             .foregroundStyle(.white)
             .fontWeight(.semibold)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.buttonRadius))
+            .shadow(color: .brand.opacity(0.3), radius: 6, x: 0, y: 3)
         }
     }
 }
 
 // MARK: - SecondaryButton
 
-/// Secondary action button with a bordered style.
 struct SecondaryButton: View {
     let title: String
     let systemImage: String?
@@ -71,26 +69,26 @@ struct SecondaryButton: View {
             HStack(spacing: 8) {
                 if let icon = systemImage {
                     Image(systemName: icon)
+                        .font(.body.weight(.semibold))
                 }
                 Text(title)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(Color(.systemBackground))
-            .foregroundStyle(Color.accentColor)
+            .padding(.vertical, 15)
+            .background(Color.cardBackground)
+            .foregroundStyle(Color.brand)
             .fontWeight(.semibold)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.accentColor, lineWidth: 1.5)
+                RoundedRectangle(cornerRadius: DesignTokens.buttonRadius)
+                    .stroke(Color.brand.opacity(0.4), lineWidth: 1.5)
             )
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.buttonRadius))
         }
     }
 }
 
 // MARK: - SectionHeader
 
-/// Styled section header text used above content groups.
 struct SectionHeader: View {
     let title: String
 
@@ -100,7 +98,8 @@ struct SectionHeader: View {
 
     var body: some View {
         Text(title)
-            .font(.headline)
+            .font(.title3)
+            .fontWeight(.bold)
             .foregroundStyle(.primary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -108,7 +107,6 @@ struct SectionHeader: View {
 
 // MARK: - EmptyStateView
 
-/// Generic empty state view used when a list has no content.
 struct EmptyStateView: View {
     let title: String
     let message: String

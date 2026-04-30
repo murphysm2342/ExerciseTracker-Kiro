@@ -24,7 +24,8 @@ struct MachineListView: View {
                 Button {
                     showAddSheet = true
                 } label: {
-                    Image(systemName: "plus")
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundStyle(Color.brand)
                 }
             }
         }
@@ -97,15 +98,21 @@ struct MachineListView: View {
     // MARK: - Machine Row
 
     private func machineRow(machine: Machine, vm: MachineListViewModel) -> some View {
-        HStack {
+        HStack(spacing: 12) {
+            IconBadge(
+                systemName: MachineIconProvider.icon(for: machine.name, category: machine.category),
+                color: MachineIconProvider.categoryColor(for: machine.category ?? ""),
+                size: 36
+            )
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(machine.name)
                     .font(.body)
-                // Req 2.7: display category alongside name
+                    .fontWeight(.medium)
                 if let category = machine.category, !category.isEmpty {
                     Text(category)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.subtleText)
                 }
             }
             Spacer()
@@ -114,6 +121,7 @@ struct MachineListView: View {
             } label: {
                 Image(systemName: machine.isFavorite ? "star.fill" : "star")
                     .foregroundStyle(machine.isFavorite ? .yellow : .secondary)
+                    .font(.body)
             }
             .buttonStyle(.plain)
         }
@@ -138,7 +146,7 @@ struct MachineListView: View {
             } label: {
                 Label("Edit", systemImage: "pencil")
             }
-            .tint(.blue)
+            .tint(.brand)
         }
     }
 }
@@ -168,7 +176,6 @@ struct MachineFormView: View {
                 Section {
                     Toggle("Favorite", isOn: $isFavorite)
                 }
-                // Req 2.8: show validation error
                 if let error = validationError {
                     Section {
                         Text(error)
@@ -185,6 +192,8 @@ struct MachineFormView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { save() }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.brand)
                 }
             }
             .onAppear {
@@ -218,6 +227,8 @@ struct MachineFormView: View {
 }
 
 #Preview {
+    @Previewable @State var vm: UserViewModel? = nil
+
     let container = try! ModelContainer(
         for: User.self, Machine.self, WorkoutSession.self,
              StrengthSet.self, CardioSession.self, WorkoutFlow.self,
@@ -226,11 +237,14 @@ struct MachineFormView: View {
     let ctx = container.mainContext
     let user = User(name: "Preview User", colorTag: "blue")
     ctx.insert(user)
-    let vm = UserViewModel(modelContext: ctx)
-    vm.selectUser(user)
+
+    let viewModel = UserViewModel(modelContext: ctx)
+    viewModel.selectUser(user)
+    vm = viewModel
+
     return NavigationStack {
         MachineListView()
     }
-    .environment(vm)
+    .environment(vm!)
     .modelContainer(container)
 }
