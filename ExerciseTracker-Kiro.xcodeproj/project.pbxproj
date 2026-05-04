@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C0357E782F6E4BB100D81413 /* SwiftCheck in Frameworks */ = {isa = PBXBuildFile; productRef = C0357E772F6E4BB100D81413 /* SwiftCheck */; };
+		C48814112FA2F64200E57AF4 /* ExerciseTracker-Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = C48814072FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -18,12 +19,34 @@
 			remoteGlobalIDString = C0357E482F6E497100D81413;
 			remoteInfo = "ExerciseTracker-Kiro";
 		};
+		C488140F2FA2F64200E57AF4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C0357E412F6E497100D81413 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C48814062FA2F64000E57AF4;
+			remoteInfo = "ExerciseTracker-Watch Watch App";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C48814152FA2F64200E57AF4 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				C48814112FA2F64200E57AF4 /* ExerciseTracker-Watch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C0357E492F6E497100D81413 /* ExerciseTracker-Kiro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ExerciseTracker-Kiro.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0357E6D2F6E4B7B00D81413 /* ExerciseTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExerciseTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C44D7F4D2F9E5EF3004C2E37 /* ExerciseTracker-Kiro.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "ExerciseTracker-Kiro.xctestplan"; sourceTree = "<group>"; };
+		C48814072FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ExerciseTracker-Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -50,6 +73,11 @@
 			path = ExerciseTrackerTests;
 			sourceTree = "<group>";
 		};
+		C48814082FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "ExerciseTracker-Watch Watch App";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +96,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C48814042FA2F64000E57AF4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -77,6 +112,7 @@
 				C44D7F4D2F9E5EF3004C2E37 /* ExerciseTracker-Kiro.xctestplan */,
 				C0357E4B2F6E497100D81413 /* ExerciseTracker-Kiro */,
 				C0357E6E2F6E4B7B00D81413 /* ExerciseTrackerTests */,
+				C48814082FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App */,
 				C0357E4A2F6E497100D81413 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,6 +122,7 @@
 			children = (
 				C0357E492F6E497100D81413 /* ExerciseTracker-Kiro.app */,
 				C0357E6D2F6E4B7B00D81413 /* ExerciseTrackerTests.xctest */,
+				C48814072FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -100,10 +137,12 @@
 				C0357E452F6E497100D81413 /* Sources */,
 				C0357E462F6E497100D81413 /* Frameworks */,
 				C0357E472F6E497100D81413 /* Resources */,
+				C48814152FA2F64200E57AF4 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				C48814102FA2F64200E57AF4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				C0357E4B2F6E497100D81413 /* ExerciseTracker-Kiro */,
@@ -139,6 +178,28 @@
 			productReference = C0357E6D2F6E4B7B00D81413 /* ExerciseTrackerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		C48814062FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C48814122FA2F64200E57AF4 /* Build configuration list for PBXNativeTarget "ExerciseTracker-Watch Watch App" */;
+			buildPhases = (
+				C48814032FA2F64000E57AF4 /* Sources */,
+				C48814042FA2F64000E57AF4 /* Frameworks */,
+				C48814052FA2F64000E57AF4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C48814082FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App */,
+			);
+			name = "ExerciseTracker-Watch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "ExerciseTracker-Watch Watch App";
+			productReference = C48814072FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -146,7 +207,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					C0357E482F6E497100D81413 = {
@@ -155,6 +216,9 @@
 					C0357E6C2F6E4B7B00D81413 = {
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = C0357E482F6E497100D81413;
+					};
+					C48814062FA2F64000E57AF4 = {
+						CreatedOnToolsVersion = 26.4.1;
 					};
 				};
 			};
@@ -177,6 +241,7 @@
 			targets = (
 				C0357E482F6E497100D81413 /* ExerciseTracker-Kiro */,
 				C0357E6C2F6E4B7B00D81413 /* ExerciseTrackerTests */,
+				C48814062FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -190,6 +255,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C0357E6B2F6E4B7B00D81413 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C48814052FA2F64000E57AF4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -213,6 +285,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C48814032FA2F64000E57AF4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -220,6 +299,11 @@
 			isa = PBXTargetDependency;
 			target = C0357E482F6E497100D81413 /* ExerciseTracker-Kiro */;
 			targetProxy = C0357E712F6E4B7B00D81413 /* PBXContainerItemProxy */;
+		};
+		C48814102FA2F64200E57AF4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C48814062FA2F64000E57AF4 /* ExerciseTracker-Watch Watch App */;
+			targetProxy = C488140F2FA2F64200E57AF4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -359,7 +443,10 @@
 				INFOPLIST_FILE = "ExerciseTracker-Kiro/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "YM Exercise Tracker";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your workouts to import cardio sessions.";
+				INFOPLIST_KEY_NFCReaderUsageDescription = "ExerciseTracker uses NFC to scan gym machine tags for quick workout logging.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ExerciseTracker reads your workout and heart rate data to display cardio metrics.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ExerciseTracker saves your workouts to Apple Health so all your fitness data is in one place.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "ExerciseTracker saves the app icon image to your photo library so you can use it in Xcode.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -395,7 +482,10 @@
 				INFOPLIST_FILE = "ExerciseTracker-Kiro/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "YM Exercise Tracker";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "This app reads your workouts to import cardio sessions.";
+				INFOPLIST_KEY_NFCReaderUsageDescription = "ExerciseTracker uses NFC to scan gym machine tags for quick workout logging.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ExerciseTracker reads your workout and heart rate data to display cardio metrics.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ExerciseTracker saves your workouts to Apple Health so all your fitness data is in one place.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "ExerciseTracker saves the app icon image to your photo library so you can use it in Xcode.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -457,6 +547,72 @@
 			};
 			name = Release;
 		};
+		C48814132FA2F64200E57AF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F7S4J74K9F;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "ExerciseTracker-Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.YoMurphCo.ExerciseTracker-Kiro";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.YoMurphCo.ExerciseTracker-Kiro.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Debug;
+		};
+		C48814142FA2F64200E57AF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F7S4J74K9F;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "ExerciseTracker-Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.YoMurphCo.ExerciseTracker-Kiro";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.YoMurphCo.ExerciseTracker-Kiro.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -483,6 +639,15 @@
 			buildConfigurations = (
 				C0357E742F6E4B7B00D81413 /* Debug */,
 				C0357E752F6E4B7B00D81413 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C48814122FA2F64200E57AF4 /* Build configuration list for PBXNativeTarget "ExerciseTracker-Watch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C48814132FA2F64200E57AF4 /* Debug */,
+				C48814142FA2F64200E57AF4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -5,13 +5,13 @@ import SwiftData
 struct ExerciseTrackerApp: App {
     let modelContainer: ModelContainer
     let userViewModel: UserViewModel
+    let phoneConnectivity = PhoneConnectivityService()
 
     init() {
         do {
-            // Use a custom URL without spaces to avoid CoreData path issues
             let url = URL.documentsDirectory.appending(path: "ExerciseTracker.store")
             let config = ModelConfiguration(url: url)
-            
+
             let container = try ModelContainer(
                 for: User.self,
                      Machine.self,
@@ -23,7 +23,6 @@ struct ExerciseTrackerApp: App {
             )
             modelContainer = container
             userViewModel = UserViewModel(modelContext: container.mainContext)
-            print("📦 ModelContainer initialized at: \(url.path())")
         } catch {
             fatalError("Failed to initialize ModelContainer: \(error)")
         }
@@ -33,6 +32,20 @@ struct ExerciseTrackerApp: App {
         WindowGroup {
             ContentView()
                 .environment(userViewModel)
+                .onAppear {
+                    phoneConnectivity.configure(
+                        modelContext: modelContainer.mainContext,
+                        userProvider: { [userViewModel] in userViewModel.activeUser }
+                    )
+                    if let user = userViewModel.activeUser {
+                        phoneConnectivity.syncMachines(for: user)
+                    }
+                }
+                .onChange(of: userViewModel.activeUser) { _, newUser in
+                    if let user = newUser {
+                        phoneConnectivity.syncMachines(for: user)
+                    }
+                }
         }
         .modelContainer(modelContainer)
     }

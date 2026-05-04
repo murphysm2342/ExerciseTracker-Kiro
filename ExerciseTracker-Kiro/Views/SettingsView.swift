@@ -134,14 +134,6 @@ struct SettingsView: View {
                     }
                 }
 
-                NavigationLink {
-                    AppIconExportView()
-                } label: {
-                    HStack(spacing: 12) {
-                        IconBadge(systemName: "app.badge", color: .purple, size: 32)
-                        Text("Export App Icon")
-                    }
-                }
             }
             .listRowBackground(Color.cardBackground)
 
