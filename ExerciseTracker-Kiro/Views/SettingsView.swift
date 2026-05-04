@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var validationError: String?
     @State private var saveError: String?
     @State private var isRequestingHK: Bool = false
+    @State private var showSaveSuccess: Bool = false
 
     private let colorOptions = ["red", "blue", "green", "orange", "purple", "yellow", "pink", "gray"]
 
@@ -134,6 +135,14 @@ struct SettingsView: View {
                     }
                 }
 
+                NavigationLink {
+                    DataBackupView()
+                } label: {
+                    HStack(spacing: 12) {
+                        IconBadge(systemName: "externaldrive.fill", color: .orange, size: 32)
+                        Text("Backup & Restore")
+                    }
+                }
             }
             .listRowBackground(Color.cardBackground)
 
@@ -149,14 +158,22 @@ struct SettingsView: View {
                 Button {
                     save()
                 } label: {
-                    Text("Save")
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                    HStack(spacing: 8) {
+                        if showSaveSuccess {
+                            Image(systemName: "checkmark")
+                                .fontWeight(.bold)
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                        Text(showSaveSuccess ? "Saved!" : "Save")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                    .animation(.easeInOut(duration: 0.2), value: showSaveSuccess)
                 }
-                .listRowBackground(Color.brand)
-                .disabled(isRequestingHK)
+                .listRowBackground(showSaveSuccess ? Color.green : Color.brand)
+                .disabled(isRequestingHK || showSaveSuccess)
             }
         }
         .scrollContentBackground(.hidden)
@@ -198,6 +215,15 @@ struct SettingsView: View {
                 syncToHealthKit: syncToHealthKit,
                 cardioSource: cardioSource
             )
+            withAnimation {
+                showSaveSuccess = true
+            }
+            Task {
+                try? await Task.sleep(for: .seconds(1.5))
+                withAnimation {
+                    showSaveSuccess = false
+                }
+            }
         } catch SettingsViewModelError.invalidName {
             validationError = "Name cannot be empty."
         } catch {

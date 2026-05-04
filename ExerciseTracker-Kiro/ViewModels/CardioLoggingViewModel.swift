@@ -45,7 +45,7 @@ enum CardioLoggingError: Error, LocalizedError {
 
     private let modelContext: ModelContext
     private let user: User
-    private let workoutDate: Date
+    var workoutDate: Date
     private let healthKitService: HealthKitServiceProtocol
 
     // MARK: - Init

@@ -23,6 +23,16 @@ struct ManualCardioView: View {
         Form {
             machineTypePicker
 
+            Section("Date") {
+                DatePicker(
+                    "Workout Date",
+                    selection: $viewModel.workoutDate,
+                    in: ...Date(),
+                    displayedComponents: [.date, .hourAndMinute]
+                )
+                .labelsHidden()
+            }
+
             Section("Duration") {
                 HStack {
                     TextField("e.g. 30", text: $durationText)

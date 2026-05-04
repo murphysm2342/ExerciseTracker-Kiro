@@ -11,6 +11,8 @@ struct HealthKitImportView: View {
     /// Callback to route back to manual entry (Req 5.5)
     let onFallbackToManual: () -> Void
 
+    @State private var importedIds: Set<UUID> = []
+
     init(viewModel: CardioLoggingViewModel, onFallbackToManual: @escaping () -> Void) {
         self._viewModel = State(initialValue: viewModel)
         self.onFallbackToManual = onFallbackToManual
@@ -31,6 +33,15 @@ struct HealthKitImportView: View {
         }
         .navigationTitle("Import from Health")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    onFallbackToManual()
+                } label: {
+                    Label("Manual Entry", systemImage: "square.and.pencil")
+                }
+            }
+        }
         .task {
             await viewModel.fetchHealthKitWorkouts()
         }
@@ -87,9 +98,15 @@ struct HealthKitImportView: View {
 
     private var workoutList: some View {
         List(viewModel.healthKitWorkouts, id: \.uuid) { workout in
-            WorkoutRowView(workout: workout) {
+            WorkoutRowView(
+                workout: workout,
+                isImported: importedIds.contains(workout.uuid)
+            ) {
                 Task {
                     try? await viewModel.importHealthKitWorkout(workout)
+                    _ = withAnimation {
+                        importedIds.insert(workout.uuid)
+                    }
                 }
             }
         }
@@ -100,6 +117,7 @@ struct HealthKitImportView: View {
 
 private struct WorkoutRowView: View {
     let workout: HKWorkout
+    let isImported: Bool
     let onImport: () -> Void
 
     var body: some View {
@@ -120,10 +138,18 @@ private struct WorkoutRowView: View {
                 .foregroundStyle(.secondary)
             }
             Spacer()
-            Button("Import", action: onImport)
-                .buttonStyle(.borderedProminent)
-                .tint(.brand)
-                .controlSize(.small)
+            if isImported {
+                Label("Imported", systemImage: "checkmark.circle.fill")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.green)
+                    .transition(.scale.combined(with: .opacity))
+            } else {
+                Button("Import", action: onImport)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.brand)
+                    .controlSize(.small)
+            }
         }
         .padding(.vertical, 4)
     }
