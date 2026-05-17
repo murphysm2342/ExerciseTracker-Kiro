@@ -64,6 +64,31 @@ enum CardioLoggingError: Error, LocalizedError {
         self.healthKitService = healthKitService
     }
 
+    // MARK: - Cardio Favorites
+
+    var sortedCardioTypes: [CardioMachineType] {
+        let favSet = Set(user.favoriteCardioTypes)
+        return CardioMachineType.allCases.sorted { a, b in
+            let aFav = favSet.contains(a.rawValue)
+            let bFav = favSet.contains(b.rawValue)
+            if aFav != bFav { return aFav }
+            return false
+        }
+    }
+
+    func isCardioFavorite(_ type: CardioMachineType) -> Bool {
+        user.favoriteCardioTypes.contains(type.rawValue)
+    }
+
+    func toggleCardioFavorite(_ type: CardioMachineType) {
+        if let idx = user.favoriteCardioTypes.firstIndex(of: type.rawValue) {
+            user.favoriteCardioTypes.remove(at: idx)
+        } else {
+            user.favoriteCardioTypes.append(type.rawValue)
+        }
+        try? modelContext.save()
+    }
+
     // MARK: - Manual Save
 
     func saveManualSession() throws {

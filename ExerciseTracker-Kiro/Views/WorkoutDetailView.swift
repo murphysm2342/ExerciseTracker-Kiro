@@ -20,6 +20,7 @@ struct WorkoutDetailView: View {
                     cardioContent
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
         }
         .id(contentID)

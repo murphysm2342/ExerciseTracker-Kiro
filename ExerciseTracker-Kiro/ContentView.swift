@@ -3,7 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(UserViewModel.self) private var userViewModel
-    @State private var showingFavoritesPicker = false
+    @State private var showingOnboarding = false
     @State private var newUser: User?
     @State private var hasCompletedOnboarding = false
     @State private var showSplash = true
@@ -32,27 +32,34 @@ struct ContentView: View {
         if userViewModel.allUsers.isEmpty || (newUser != nil && !hasCompletedOnboarding) {
             ZStack {
                 EditProfileView(onCreated: { user in
-                    print("ContentView: User created, preparing favorites picker")
                     newUser = user
-                    showingFavoritesPicker = true
+                    showingOnboarding = true
                 })
 
-                if showingFavoritesPicker {
+                if showingOnboarding {
                     Color.clear
                         .ignoresSafeArea()
                 }
             }
-            .sheet(isPresented: $showingFavoritesPicker, onDismiss: {
+            .sheet(isPresented: $showingOnboarding, onDismiss: {
                 hasCompletedOnboarding = true
                 newUser = nil
             }) {
                 if let user = newUser {
-                    MachineFavoritesSetupView(user: user)
-                        .interactiveDismissDisabled()
+                    OnboardingSetupView(user: user) {
+                        showingOnboarding = false
+                    }
+                    .interactiveDismissDisabled()
                 }
             }
         } else if userViewModel.activeUser == nil {
-            ProfileSelectorView(canDismiss: false)
+            if userViewModel.allUsers.count == 1 {
+                Color.clear.onAppear {
+                    userViewModel.selectUser(userViewModel.allUsers[0])
+                }
+            } else {
+                ProfileSelectorView(canDismiss: false)
+            }
         } else {
             TabView {
                 HomeView()

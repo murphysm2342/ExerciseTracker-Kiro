@@ -78,38 +78,50 @@ struct ManualCardioView: View {
         Section {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(CardioMachineType.allCases) { type in
+                    ForEach(viewModel.sortedCardioTypes) { type in
                         Button {
                             viewModel.machineType = type
                         } label: {
-                            VStack(spacing: 6) {
-                                Image(systemName: type.iconName)
-                                    .font(.title3)
-                                Text(type.displayName)
-                                    .font(.caption2)
-                                    .lineLimit(1)
+                            ZStack(alignment: .topTrailing) {
+                                VStack(spacing: 6) {
+                                    Image(systemName: type.iconName)
+                                        .font(.title3)
+                                    Text(type.displayName)
+                                        .font(.caption2)
+                                        .lineLimit(1)
+                                }
+                                .frame(width: 80, height: 70)
+                                .background(
+                                    viewModel.machineType == type
+                                        ? Color.brand.opacity(0.15)
+                                        : Color.clear
+                                )
+                                .foregroundStyle(
+                                    viewModel.machineType == type
+                                        ? Color.brand
+                                        : .secondary
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: DesignTokens.smallRadius))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: DesignTokens.smallRadius)
+                                        .stroke(
+                                            viewModel.machineType == type ? Color.brand : Color.clear,
+                                            lineWidth: 1.5
+                                        )
+                                )
+
+                                if viewModel.isCardioFavorite(type) {
+                                    Image(systemName: "star.fill")
+                                        .font(.system(size: 10))
+                                        .foregroundStyle(.yellow)
+                                        .offset(x: -4, y: 4)
+                                }
                             }
-                            .frame(width: 80, height: 70)
-                            .background(
-                                viewModel.machineType == type
-                                    ? Color.brand.opacity(0.15)
-                                    : Color.clear
-                            )
-                            .foregroundStyle(
-                                viewModel.machineType == type
-                                    ? Color.brand
-                                    : .secondary
-                            )
-                            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.smallRadius))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: DesignTokens.smallRadius)
-                                    .stroke(
-                                        viewModel.machineType == type ? Color.brand : Color.clear,
-                                        lineWidth: 1.5
-                                    )
-                            )
                         }
                         .buttonStyle(.plain)
+                        .onLongPressGesture {
+                            viewModel.toggleCardioFavorite(type)
+                        }
                     }
                 }
                 .padding(.vertical, 4)
@@ -133,6 +145,16 @@ struct ManualCardioView: View {
             bikeFields
         case .rowingMachine:
             rowingFields
+        case .outdoorRun:
+            outdoorRunFields
+        case .outdoorCycling:
+            outdoorCyclingFields
+        case .hiking:
+            hikingFields
+        case .swimming:
+            swimmingFields
+        case .jumpRope, .hiit, .boxing, .yoga, .pilates, .stretching, .dance:
+            EmptyView()
         }
     }
 
@@ -172,6 +194,34 @@ struct ManualCardioView: View {
             fieldRow("Distance", text: $distanceText, unit: "meters")
             fieldRow("Strokes", text: $strokeCountText, unit: "total", keyboard: .numberPad)
             fieldRow("Resistance", text: $resistanceText, unit: "level")
+        }
+    }
+
+    private var outdoorRunFields: some View {
+        Section("Run Details") {
+            fieldRow("Distance", text: $distanceText, unit: "miles")
+            fieldRow("Avg Speed", text: $speedText, unit: "mph")
+            fieldRow("Incline", text: $inclineText, unit: "%")
+        }
+    }
+
+    private var outdoorCyclingFields: some View {
+        Section("Cycling Details") {
+            fieldRow("Distance", text: $distanceText, unit: "miles")
+            fieldRow("Avg Speed", text: $speedText, unit: "mph")
+        }
+    }
+
+    private var hikingFields: some View {
+        Section("Hiking Details") {
+            fieldRow("Distance", text: $distanceText, unit: "miles")
+            fieldRow("Elevation", text: $inclineText, unit: "ft")
+        }
+    }
+
+    private var swimmingFields: some View {
+        Section("Swimming Details") {
+            fieldRow("Distance", text: $distanceText, unit: "yards")
         }
     }
 

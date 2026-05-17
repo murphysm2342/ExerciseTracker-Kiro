@@ -12,9 +12,9 @@ struct WatchStrengthPickerView: View {
                     Image(systemName: "iphone.and.arrow.forward")
                         .font(.title2)
                         .foregroundStyle(.secondary)
-                    Text("No machines synced")
+                    Text("No exercises synced")
                         .font(.headline)
-                    Text("Open the iPhone app to sync your machines.")
+                    Text("Open the iPhone app to sync your exercises.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
@@ -77,7 +77,7 @@ struct WatchStrengthPickerView: View {
                 }
             }
         }
-        .navigationTitle("Machines")
+        .navigationTitle("Exercises")
     }
 
     private func finishWorkout() {

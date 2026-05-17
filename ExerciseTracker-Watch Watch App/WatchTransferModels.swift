@@ -36,6 +36,9 @@ struct WatchCardioData: Codable {
 
 enum WatchCardioType: String, CaseIterable, Identifiable {
     case treadmill, elliptical, stairStepper, stationaryBike, rowingMachine
+    case outdoorRun, outdoorCycling, hiking
+    case swimming, jumpRope, hiit, boxing
+    case yoga, pilates, stretching, dance
 
     var id: String { rawValue }
 
@@ -46,6 +49,17 @@ enum WatchCardioType: String, CaseIterable, Identifiable {
         case .stairStepper:   return "Stair Stepper"
         case .stationaryBike: return "Bike"
         case .rowingMachine:  return "Rowing"
+        case .outdoorRun:     return "Run"
+        case .outdoorCycling: return "Cycling"
+        case .hiking:         return "Hiking"
+        case .swimming:       return "Swimming"
+        case .jumpRope:       return "Jump Rope"
+        case .hiit:           return "HIIT"
+        case .boxing:         return "Boxing"
+        case .yoga:           return "Yoga"
+        case .pilates:        return "Pilates"
+        case .stretching:     return "Stretching"
+        case .dance:          return "Dance"
         }
     }
 
@@ -56,6 +70,17 @@ enum WatchCardioType: String, CaseIterable, Identifiable {
         case .stairStepper:   return "figure.stair.stepper"
         case .stationaryBike: return "figure.indoor.cycle"
         case .rowingMachine:  return "figure.rower"
+        case .outdoorRun:     return "figure.run"
+        case .outdoorCycling: return "figure.outdoor.cycle"
+        case .hiking:         return "figure.hiking"
+        case .swimming:       return "figure.pool.swim"
+        case .jumpRope:       return "figure.jumprope"
+        case .hiit:           return "figure.highintensity.intervaltraining"
+        case .boxing:         return "figure.boxing"
+        case .yoga:           return "figure.yoga"
+        case .pilates:        return "figure.pilates"
+        case .stretching:     return "figure.cooldown"
+        case .dance:          return "figure.dance"
         }
     }
 }

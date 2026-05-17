@@ -28,7 +28,7 @@ struct WorkoutFlowBuilderView: View {
 
                 Section {
                     if orderedMachines.isEmpty {
-                        Text("No machines added yet.")
+                        Text("No exercises added yet.")
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(orderedMachines) { machine in
@@ -56,11 +56,11 @@ struct WorkoutFlowBuilderView: View {
                     Button {
                         showMachinePicker = true
                     } label: {
-                        Label("Add Machine", systemImage: "plus")
+                        Label("Add Exercise", systemImage: "plus")
                     }
                 } header: {
                     HStack {
-                        Text("Machines (in order)")
+                        Text("Exercises (in order)")
                         Spacer()
                         if !orderedMachines.isEmpty {
                             EditButton()
@@ -147,9 +147,9 @@ private struct MachinePickerView: View {
             Group {
                 if machines.isEmpty {
                     ContentUnavailableView(
-                        "No Machines",
+                        "No Exercises",
                         systemImage: "dumbbell",
-                        description: Text("Add machines in the Machines settings first.")
+                        description: Text("Add exercises in the Exercises settings first.")
                     )
                 } else {
                     List(machines) { machine in
@@ -177,7 +177,7 @@ private struct MachinePickerView: View {
                     }
                 }
             }
-            .navigationTitle("Select Machine")
+            .navigationTitle("Select Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

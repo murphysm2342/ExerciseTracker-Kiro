@@ -122,7 +122,7 @@ struct SettingsView: View {
                 } label: {
                     HStack(spacing: 12) {
                         IconBadge(systemName: "dumbbell.fill", color: .strengthAccent, size: 32)
-                        Text("Machines")
+                        Text("Exercises")
                     }
                 }
 

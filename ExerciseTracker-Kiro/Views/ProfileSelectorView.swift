@@ -10,7 +10,7 @@ struct ProfileSelectorView: View {
 
     @State private var showAddProfile = false
     @State private var userToEdit: User? = nil
-    @State private var showMachineFavorites = false
+    @State private var showOnboarding = false
     @State private var newlyCreatedUser: User? = nil
 
     var body: some View {
@@ -69,19 +69,21 @@ struct ProfileSelectorView: View {
                     newlyCreatedUser = user
                     // Delay briefly to ensure the first sheet dismisses before showing the next
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showMachineFavorites = true
+                        showOnboarding = true
                     }
                 })
             }
             .sheet(item: $userToEdit) { user in
                 EditProfileView(userToEdit: user)
             }
-            .sheet(isPresented: $showMachineFavorites) {
+            .sheet(isPresented: $showOnboarding, onDismiss: {
+                newlyCreatedUser = nil
+            }) {
                 if let user = newlyCreatedUser {
-                    MachineFavoritesSelectorView(user: user) {
-                        // Clean up after favorites are selected
-                        newlyCreatedUser = nil
+                    OnboardingSetupView(user: user) {
+                        showOnboarding = false
                     }
+                    .interactiveDismissDisabled()
                 }
             }
         }

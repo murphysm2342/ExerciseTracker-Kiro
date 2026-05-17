@@ -5,6 +5,7 @@ import SwiftData
     var maxWeightByMachine: [MachineMaxWeight] = []
     var weightTrend: [WeightTrendPoint] = []
     var cardioTrend: [CardioTrendPoint] = []
+    var cardioByType: [CardioTypeStat] = []
     var machines: [Machine] = []
     var selectedMachine: Machine?
     var selectedTrendPeriod: TrendPeriod = .month
@@ -40,6 +41,15 @@ import SwiftData
         let avgHeartRate: Double?
     }
 
+    struct CardioTypeStat: Identifiable {
+        let id = UUID()
+        let machineType: CardioMachineType
+        let sessionCount: Int
+        let totalMinutes: Double
+        let totalDistance: Double?
+        let avgHeartRate: Double?
+    }
+
     enum TrendPeriod: String, CaseIterable {
         case week = "7D"
         case month = "30D"
@@ -62,6 +72,7 @@ import SwiftData
         fetchMachines(for: user)
         computeMaxWeightByMachine(for: user)
         computeCardioTrend(for: user)
+        computeCardioByType(for: user)
         if let machine = selectedMachine {
             computeWeightTrend(for: machine, user: user)
         } else if let first = maxWeightByMachine.first,
@@ -82,6 +93,7 @@ import SwiftData
             computeWeightTrend(for: machine, user: user)
         }
         computeCardioTrend(for: user)
+        computeCardioByType(for: user)
     }
 
     // MARK: - Queries
@@ -187,6 +199,45 @@ import SwiftData
                 avgHeartRate: cardio.avgHeartRate
             )
         }
+    }
+
+    private func computeCardioByType(for user: User) {
+        let userId = user.id
+        let descriptor = FetchDescriptor<WorkoutSession>(
+            predicate: #Predicate { $0.user.id == userId },
+            sortBy: [SortDescriptor(\.date)]
+        )
+        let allSessions = (try? modelContext.fetch(descriptor)) ?? []
+        let sessions = allSessions.filter { $0.type == .cardio }
+
+        let cutoff = periodCutoff()
+        let filtered = cutoff == nil ? sessions : sessions.filter { $0.date >= cutoff! }
+
+        var grouped: [CardioMachineType: (count: Int, minutes: Double, distance: Double, heartRateSum: Double, heartRateCount: Int)] = [:]
+
+        for session in filtered {
+            guard let cardio = session.cardioSession, let type = cardio.machineType else { continue }
+            var entry = grouped[type] ?? (count: 0, minutes: 0, distance: 0, heartRateSum: 0, heartRateCount: 0)
+            entry.count += 1
+            entry.minutes += cardio.durationMinutes
+            entry.distance += cardio.distanceMiles ?? 0
+            if let hr = cardio.avgHeartRate {
+                entry.heartRateSum += hr
+                entry.heartRateCount += 1
+            }
+            grouped[type] = entry
+        }
+
+        cardioByType = grouped.map { type, data in
+            CardioTypeStat(
+                machineType: type,
+                sessionCount: data.count,
+                totalMinutes: data.minutes,
+                totalDistance: data.distance > 0 ? data.distance : nil,
+                avgHeartRate: data.heartRateCount > 0 ? data.heartRateSum / Double(data.heartRateCount) : nil
+            )
+        }
+        .sorted { $0.totalMinutes > $1.totalMinutes }
     }
 
     private func periodCutoff() -> Date? {

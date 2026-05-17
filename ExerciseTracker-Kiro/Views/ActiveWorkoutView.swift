@@ -66,9 +66,9 @@ struct ActiveWorkoutView: View {
 
     private var emptyState: some View {
         ContentUnavailableView(
-            "No Machines Yet",
+            "No Exercises Yet",
             systemImage: "dumbbell",
-            description: Text("Tap \"Add Machine\" to start logging sets.")
+            description: Text("Tap \"Add Exercise\" to start logging sets.")
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -91,7 +91,7 @@ struct ActiveWorkoutView: View {
         Button {
             showMachinePicker = true
         } label: {
-            Label("Add Machine", systemImage: "plus.circle.fill")
+            Label("Add Exercise", systemImage: "plus.circle.fill")
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color.accentColor)
@@ -175,9 +175,9 @@ struct WorkoutMachinePickerView: View {
                     ProgressView()
                 }
             }
-            .navigationTitle("Select Machine")
+            .navigationTitle("Select Exercise")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Search machines")
+            .searchable(text: $searchText, prompt: "Search exercises")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }

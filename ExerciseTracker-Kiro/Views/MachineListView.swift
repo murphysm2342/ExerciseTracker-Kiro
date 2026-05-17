@@ -18,7 +18,7 @@ struct MachineListView: View {
                 ProgressView()
             }
         }
-        .navigationTitle("Machines")
+        .navigationTitle("Exercises")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
@@ -67,9 +67,9 @@ struct MachineListView: View {
     private func machineList(vm: MachineListViewModel) -> some View {
         if vm.machines.isEmpty {
             ContentUnavailableView(
-                "No Machines",
+                "No Exercises",
                 systemImage: "dumbbell",
-                description: Text("Tap + to add your first machine.")
+                description: Text("Tap + to add your first exercise.")
             )
         } else {
             List {
@@ -85,7 +85,7 @@ struct MachineListView: View {
                 }
 
                 if !others.isEmpty {
-                    Section(favorites.isEmpty ? "" : "All Machines") {
+                    Section(favorites.isEmpty ? "" : "All Exercises") {
                         ForEach(others) { machine in
                             machineRow(machine: machine, vm: vm)
                         }
@@ -134,7 +134,7 @@ struct MachineListView: View {
                 do {
                     try vm.deleteMachine(machine)
                 } catch {
-                    errorMessage = "Failed to delete machine."
+                    errorMessage = "Failed to delete exercise."
                 }
             } label: {
                 Label("Delete", systemImage: "trash")
@@ -184,7 +184,7 @@ struct MachineFormView: View {
                     }
                 }
             }
-            .navigationTitle(isEditing ? "Edit Machine" : "Add Machine")
+            .navigationTitle(isEditing ? "Edit Exercise" : "Add Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -221,7 +221,7 @@ struct MachineFormView: View {
         } catch MachineListViewModelError.invalidName {
             validationError = "Name cannot be empty."
         } catch {
-            validationError = "Failed to save machine."
+            validationError = "Failed to save exercise."
         }
     }
 }

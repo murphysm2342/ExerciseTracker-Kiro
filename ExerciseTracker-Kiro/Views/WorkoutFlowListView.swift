@@ -68,7 +68,7 @@ struct WorkoutFlowListView: View {
             Text(flow.name)
                 .font(.headline)
             if ordered.isEmpty {
-                Text("No machines")
+                Text("No exercises")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {

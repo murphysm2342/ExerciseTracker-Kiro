@@ -25,6 +25,24 @@ struct MachineCatalogService {
         ("Triceps Press",        "Arms"),
     ]
 
+    static let freeWeightExercises: [(name: String, category: String)] = [
+        ("Smith Machine Bench Press",  "Chest"),
+        ("Smith Machine Squat",        "Legs"),
+        ("Dumbbell Bench Press",       "Chest"),
+        ("Dumbbell Incline Press",     "Chest"),
+        ("Dumbbell Shoulder Press",    "Shoulders"),
+        ("Dumbbell Lateral Raise",     "Shoulders"),
+        ("Dumbbell Curl",              "Arms"),
+        ("Dumbbell Hammer Curl",       "Arms"),
+        ("Dumbbell Triceps Extension", "Arms"),
+        ("Dumbbell Row",               "Back"),
+        ("Dumbbell Lunges",            "Legs"),
+        ("Cable Fly",                  "Chest"),
+        ("Cable Triceps Pushdown",     "Arms"),
+        ("Cable Biceps Curl",          "Arms"),
+        ("Cable Row",                  "Back"),
+    ]
+
     /// Seeds the default machine catalog for `user` if they have no machines yet.
     /// Safe to call multiple times — skips if machines already exist.
     static func seedIfNeeded(for user: User, modelContext: ModelContext) {
@@ -38,12 +56,29 @@ struct MachineCatalogService {
             )
             modelContext.insert(machine)
         }
-        // Force save and handle errors properly instead of silently failing
         do {
             try modelContext.save()
-            print("✅ Seeded \(defaultMachines.count) machines for user \(user.name)")
         } catch {
-            print("❌ Failed to seed machines: \(error)")
+            print("Failed to seed machines: \(error)")
+        }
+    }
+
+    /// Seeds free weight exercises for a user. Skips any that already exist by name.
+    static func seedFreeWeights(for user: User, modelContext: ModelContext) {
+        let existingNames = Set(user.machines.map(\.name))
+        var added = 0
+        for entry in freeWeightExercises where !existingNames.contains(entry.name) {
+            let machine = Machine(
+                name: entry.name,
+                category: entry.category,
+                isFavorite: false,
+                user: user
+            )
+            modelContext.insert(machine)
+            added += 1
+        }
+        if added > 0 {
+            try? modelContext.save()
         }
     }
 }

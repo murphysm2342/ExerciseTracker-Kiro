@@ -11,10 +11,11 @@ import SwiftData
     var usesHealthKit: Bool
     /// Task 7: Whether to automatically export/sync workouts TO HealthKit
     var syncToHealthKit: Bool
-    
+    var favoriteCardioTypes: [String] = []
+
     @Relationship(deleteRule: .cascade, inverse: \Machine.user) var machines: [Machine]
     @Relationship(deleteRule: .cascade, inverse: \WorkoutSession.user) var workoutSessions: [WorkoutSession]
-    
+
     init(
         id: UUID = UUID(),
         name: String,
@@ -22,7 +23,8 @@ import SwiftData
         createdAt: Date = Date(),
         preferredCardioSource: CardioSource = .manual,
         usesHealthKit: Bool = false,
-        syncToHealthKit: Bool = false
+        syncToHealthKit: Bool = false,
+        favoriteCardioTypes: [String] = []
     ) {
         self.id = id
         self.name = name
@@ -31,6 +33,7 @@ import SwiftData
         self.preferredCardioSource = preferredCardioSource
         self.usesHealthKit = usesHealthKit
         self.syncToHealthKit = syncToHealthKit
+        self.favoriteCardioTypes = favoriteCardioTypes
         self.machines = []
         self.workoutSessions = []
     }

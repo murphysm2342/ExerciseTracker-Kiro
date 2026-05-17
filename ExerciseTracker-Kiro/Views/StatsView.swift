@@ -94,7 +94,7 @@ private struct StatsContentView: View {
 
     private var maxWeightSection: some View {
         VStack(alignment: .leading, spacing: DesignTokens.itemSpacing) {
-            Text("Max Weight by Machine")
+            Text("Max Weight by Exercise")
                 .font(.headline)
 
             if viewModel.maxWeightByMachine.isEmpty {
@@ -103,7 +103,7 @@ private struct StatsContentView: View {
                 Chart(viewModel.maxWeightByMachine) { item in
                     BarMark(
                         x: .value("Weight", item.maxWeight),
-                        y: .value("Machine", item.machineName)
+                        y: .value("Exercise", item.machineName)
                     )
                     .foregroundStyle(
                         LinearGradient(
@@ -158,7 +158,7 @@ private struct StatsContentView: View {
             }
 
             if viewModel.weightTrend.isEmpty {
-                emptyChart("No data for this machine yet.")
+                emptyChart("No data for this exercise yet.")
             } else {
                 Chart(viewModel.weightTrend) { point in
                     LineMark(
@@ -264,6 +264,10 @@ private struct StatsContentView: View {
                     cardioDistanceChart
                 }
             }
+
+            if !viewModel.cardioByType.isEmpty {
+                cardioByTypeSection
+            }
         }
     }
 
@@ -341,6 +345,81 @@ private struct StatsContentView: View {
                 }
             }
             .frame(height: 160)
+        }
+        .cardStyle()
+    }
+
+    // MARK: - Cardio By Type
+
+    private var cardioByTypeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("By Activity")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Chart(viewModel.cardioByType) { stat in
+                BarMark(
+                    x: .value("Minutes", stat.totalMinutes),
+                    y: .value("Activity", stat.machineType.displayName)
+                )
+                .foregroundStyle(LinearGradient.cardioGradient)
+                .cornerRadius(4)
+                .annotation(position: .trailing, spacing: 4) {
+                    Text("\(Int(stat.totalMinutes))m")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .chartXAxis {
+                AxisMarks { value in
+                    AxisGridLine()
+                    AxisValueLabel {
+                        if let v = value.as(Double.self) {
+                            Text("\(Int(v))")
+                        }
+                    }
+                }
+            }
+            .chartYAxis {
+                AxisMarks { value in
+                    AxisValueLabel {
+                        if let name = value.as(String.self) {
+                            Text(name)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+            }
+            .frame(height: CGFloat(max(viewModel.cardioByType.count, 1)) * 36)
+
+            ForEach(viewModel.cardioByType) { stat in
+                HStack(spacing: 10) {
+                    Image(systemName: stat.machineType.iconName)
+                        .font(.caption)
+                        .foregroundStyle(Color.cardioAccent)
+                        .frame(width: 20)
+                    Text(stat.machineType.displayName)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 1) {
+                        Text("\(stat.sessionCount) session\(stat.sessionCount == 1 ? "" : "s")")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        if let dist = stat.totalDistance {
+                            Text(String(format: "%.1f mi", dist))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        if let hr = stat.avgHeartRate {
+                            Text(String(format: "%.0f avg bpm", hr))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
         }
         .cardStyle()
     }

@@ -63,7 +63,7 @@ struct StrengthLoggingView: View {
                             fieldBuffers: viewModel.fieldBuffers,
                             onActivate: { target in viewModel.activateField(target) },
                             onRepsAdjust: { amount in viewModel.adjustReps(for: set.id, by: amount) },
-                            onDelete: viewModel.sets.count > 1 ? { viewModel.deleteSet(set) } : nil
+                            onDelete: { viewModel.deleteSet(set) }
                         )
                         .padding(.horizontal)
                     }

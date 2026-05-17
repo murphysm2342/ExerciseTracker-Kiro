@@ -43,7 +43,7 @@ struct WatchHomeView: View {
                     }
 
                     if !connectivity.machines.isEmpty {
-                        Text("\(connectivity.machines.count) machines synced")
+                        Text("\(connectivity.machines.count) exercises synced")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
