@@ -4,6 +4,7 @@ import SwiftData
 struct StrengthLoggingView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(UserViewModel.self) private var userViewModel
+    @Environment(PBCelebrationManager.self) private var celebrationManager
     @Environment(\.modelContext) private var modelContext
 
     let machineName: String
@@ -165,10 +166,26 @@ struct StrengthLoggingView: View {
     private func trySave() {
         do {
             try viewModel.saveSession()
+            let pb = computePB()
             dismiss()
+            if let pb {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
+                    celebrationManager.celebrate(pb)
+                }
+            }
         } catch {
             print("Save error: \(error)")
         }
+    }
+
+    private func computePB() -> PBAchievement? {
+        guard let user = userViewModel.activeUser, user.celebrationsEnabled else { return nil }
+        return PersonalBestService.checkStrengthPB(
+            machine: initialMachine,
+            session: initialSession,
+            user: user
+        )
     }
 
     private func profileColor(for tag: String?) -> Color {

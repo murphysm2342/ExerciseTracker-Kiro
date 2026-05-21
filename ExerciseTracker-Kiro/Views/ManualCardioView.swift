@@ -3,6 +3,7 @@ import SwiftData
 
 struct ManualCardioView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(PBCelebrationManager.self) private var celebrationManager
 
     @Bindable var viewModel: CardioLoggingViewModel
 
@@ -254,8 +255,17 @@ struct ManualCardioView: View {
         viewModel.rpm = rpmText.isEmpty ? nil : Double(rpmText)
 
         do {
-            try viewModel.saveManualSession()
+            let session = try viewModel.saveManualSession()
+            let pb: PBAchievement? = viewModel.user.celebrationsEnabled
+                ? PersonalBestService.checkCardioPB(session: session, user: viewModel.user)
+                : nil
             dismiss()
+            if let pb {
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(500))
+                    celebrationManager.celebrate(pb)
+                }
+            }
         } catch CardioLoggingError.invalidDuration {
             errorMessage = "Duration must be greater than zero."
             showError = true

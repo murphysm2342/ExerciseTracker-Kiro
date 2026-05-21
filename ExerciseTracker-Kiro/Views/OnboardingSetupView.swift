@@ -8,7 +8,7 @@ struct OnboardingSetupView: View {
     let onComplete: () -> Void
 
     @State private var step: OnboardingStep = .categories
-    @State private var wantsStrengthMachines = true
+    @State private var wantsStrengthMachines = false
     @State private var wantsFreeWeights = false
     @State private var wantsCardio = false
     @State private var selectedMachineIds: Set<UUID> = []

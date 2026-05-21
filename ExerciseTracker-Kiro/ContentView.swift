@@ -3,6 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(UserViewModel.self) private var userViewModel
+    @Environment(PBCelebrationManager.self) private var celebrationManager
     @State private var showingOnboarding = false
     @State private var newUser: User?
     @State private var hasCompletedOnboarding = false
@@ -17,7 +18,13 @@ struct ContentView: View {
                 SplashScreenView()
                     .transition(.opacity)
             }
+
+            if let achievement = celebrationManager.active {
+                CelebrationOverlay(achievement: achievement)
+                    .zIndex(1000)
+            }
         }
+        .animation(.easeInOut(duration: 0.3), value: celebrationManager.active)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
                 withAnimation(.easeOut(duration: 0.5)) {
@@ -154,5 +161,6 @@ private struct SplashScreenView: View {
     let vm = UserViewModel(modelContext: container.mainContext)
     return ContentView()
         .environment(vm)
+        .environment(PBCelebrationManager())
         .modelContainer(container)
 }

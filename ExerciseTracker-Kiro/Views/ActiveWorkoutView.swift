@@ -6,6 +6,7 @@ import SwiftData
 struct ActiveWorkoutView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(UserViewModel.self) private var userViewModel
+    @Environment(PBCelebrationManager.self) private var celebrationManager
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: ActiveWorkoutViewModel
@@ -20,46 +21,54 @@ struct ActiveWorkoutView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                if viewModel.machinesInSession.isEmpty {
-                    emptyState
-                } else {
-                    machineList
-                }
+        ZStack {
+            NavigationStack {
+                VStack(spacing: 0) {
+                    if viewModel.machinesInSession.isEmpty {
+                        emptyState
+                    } else {
+                        machineList
+                    }
 
-                Spacer()
+                    Spacer()
 
-                addMachineButton
-                    .padding()
-            }
-            .navigationTitle("Today's Workout")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    addMachineButton
+                        .padding()
                 }
-            }
-            // Navigate to logging view after picking a machine from the picker sheet
-            .navigationDestination(isPresented: $navigateToMachine) {
-                if let machine = selectedMachine {
+                .navigationTitle("Today's Workout")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { dismiss() }
+                    }
+                }
+                // Navigate to logging view after picking a machine from the picker sheet
+                .navigationDestination(isPresented: $navigateToMachine) {
+                    if let machine = selectedMachine {
+                        machineLoggingView(for: machine)
+                    }
+                }
+                // Navigate to logging view for machines already in the session (via NavigationLink value)
+                .navigationDestination(for: Machine.self) { machine in
                     machineLoggingView(for: machine)
                 }
+                .sheet(isPresented: $showMachinePicker) {
+                    WorkoutMachinePickerView(
+                        session: viewModel.session,
+                        onSelect: { machine in
+                            selectedMachine = machine
+                            navigateToMachine = true
+                        }
+                    )
+                }
             }
-            // Navigate to logging view for machines already in the session (via NavigationLink value)
-            .navigationDestination(for: Machine.self) { machine in
-                machineLoggingView(for: machine)
-            }
-            .sheet(isPresented: $showMachinePicker) {
-                WorkoutMachinePickerView(
-                    session: viewModel.session,
-                    onSelect: { machine in
-                        selectedMachine = machine
-                        navigateToMachine = true
-                    }
-                )
+
+            if let achievement = celebrationManager.active {
+                CelebrationOverlay(achievement: achievement)
+                    .zIndex(1000)
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: celebrationManager.active)
     }
 
     // MARK: - Subviews

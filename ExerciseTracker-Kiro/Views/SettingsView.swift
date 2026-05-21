@@ -13,6 +13,7 @@ struct SettingsView: View {
     @State private var usesHealthKit: Bool = false
     @State private var syncToHealthKit: Bool = false
     @State private var cardioSource: CardioSource = .manual
+    @State private var celebrationsEnabled: Bool = true
 
     @State private var validationError: String?
     @State private var saveError: String?
@@ -116,6 +117,15 @@ struct SettingsView: View {
             }
             .listRowBackground(Color.cardBackground)
 
+            Section("Celebrations") {
+                Toggle("Celebrate Personal Bests", isOn: $celebrationsEnabled)
+                    .tint(.brand)
+                Text("Show confetti when you hit a new PB on an exercise or cardio activity.")
+                    .font(.caption)
+                    .foregroundStyle(Color.subtleText)
+            }
+            .listRowBackground(Color.cardBackground)
+
             Section("Manage") {
                 NavigationLink {
                     MachineListView()
@@ -197,6 +207,7 @@ struct SettingsView: View {
         usesHealthKit = user.usesHealthKit
         syncToHealthKit = user.syncToHealthKit
         cardioSource = user.preferredCardioSource
+        celebrationsEnabled = user.celebrationsEnabled
         validationError = nil
         saveError = nil
     }
@@ -213,7 +224,8 @@ struct SettingsView: View {
                 colorTag: tagValue,
                 usesHealthKit: usesHealthKit,
                 syncToHealthKit: syncToHealthKit,
-                cardioSource: cardioSource
+                cardioSource: cardioSource,
+                celebrationsEnabled: celebrationsEnabled
             )
             withAnimation {
                 showSaveSuccess = true

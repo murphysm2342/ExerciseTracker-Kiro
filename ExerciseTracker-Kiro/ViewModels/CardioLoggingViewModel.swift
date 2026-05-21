@@ -44,7 +44,7 @@ enum CardioLoggingError: Error, LocalizedError {
     // MARK: - Dependencies
 
     private let modelContext: ModelContext
-    private let user: User
+    let user: User
     var workoutDate: Date
     private let healthKitService: HealthKitServiceProtocol
 
@@ -91,7 +91,8 @@ enum CardioLoggingError: Error, LocalizedError {
 
     // MARK: - Manual Save
 
-    func saveManualSession() throws {
+    @discardableResult
+    func saveManualSession() throws -> WorkoutSession {
         guard durationMinutes > 0 else {
             throw CardioLoggingError.invalidDuration
         }
@@ -132,6 +133,8 @@ enum CardioLoggingError: Error, LocalizedError {
                 }
             }
         }
+
+        return session
     }
 
     // MARK: - HealthKit Fetch

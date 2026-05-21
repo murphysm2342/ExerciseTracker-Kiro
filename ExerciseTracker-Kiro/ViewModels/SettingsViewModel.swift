@@ -34,7 +34,8 @@ enum SettingsViewModelError: Error, LocalizedError {
         colorTag: String?,
         usesHealthKit: Bool,
         syncToHealthKit: Bool,
-        cardioSource: CardioSource
+        cardioSource: CardioSource,
+        celebrationsEnabled: Bool
     ) throws {
         let trimmed = name.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else {
@@ -45,6 +46,7 @@ enum SettingsViewModelError: Error, LocalizedError {
         user.usesHealthKit = usesHealthKit
         user.syncToHealthKit = syncToHealthKit
         user.preferredCardioSource = cardioSource
+        user.celebrationsEnabled = celebrationsEnabled
         do {
             try modelContext.save()
         } catch {

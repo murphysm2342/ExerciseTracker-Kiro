@@ -6,6 +6,7 @@ struct ExerciseTrackerApp: App {
     let modelContainer: ModelContainer
     let userViewModel: UserViewModel
     let phoneConnectivity = PhoneConnectivityService()
+    let celebrationManager = PBCelebrationManager()
 
     init() {
         do {
@@ -32,6 +33,7 @@ struct ExerciseTrackerApp: App {
         WindowGroup {
             ContentView()
                 .environment(userViewModel)
+                .environment(celebrationManager)
                 .onAppear {
                     phoneConnectivity.configure(
                         modelContext: modelContainer.mainContext,
